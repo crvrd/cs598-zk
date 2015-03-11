@@ -14,7 +14,7 @@ Verifier asks the prover to prove that a specific graph is 3-colorable.  The pro
 	* ~~Prover sends the colors and random strings for the two corresponding vertices~~
 	* ~~Verifier verifies the commitment corresponds to two differently-colored vertices~~
 * ~~If all of the |E|^2 requests are verified, the verifier considers the graph colorability to be proven~~
-* ~~Various demos:
+* ~~Various demos:~~
     * ~~Correct prover and verifier~~
     * ~~Cheating prover~~
     * ~~Cheating verifier?~~
