@@ -12,6 +12,7 @@ public:
     void AssignNeighbors(int i, int j);
     void UnassignNeighbors(int i, int j);
     bool Solve(int idx);
+    void Print();
     int numnodes;
     Node* nodes;
     bool** neighbors;

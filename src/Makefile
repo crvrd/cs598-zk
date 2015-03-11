@@ -2,10 +2,16 @@ COMPILER = g++
 COMPILER_FLAGS = -c -g -O0 -Wall -fpermissive
 LINKER = g++
 
-test: test.o network.o graph.o node.o
-	$(LINKER) test.o network.o graph.o node.o -o test
+test: test.o prover.o verifier.o network.o graph.o node.o
+	$(LINKER) test.o prover.o verifier.o network.o graph.o node.o -o test
 
 all: test
+
+prover.o: prover.cc prover.h network.h
+	$(COMPILER) $(COMPILER_FLAGS) prover.cc
+
+verifier.o: verifier.cc verifier.h network.h
+	$(COMPILER) $(COMPILER_FLAGS) verifier.cc
 
 network.o: network.cc network.h graph.h
 	$(COMPILER) $(COMPILER_FLAGS) network.cc

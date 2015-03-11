@@ -66,3 +66,22 @@ bool Graph::TestSolution() {
     cout << endl;
     return true;
 }
+
+void Graph::Print() {
+    for(int i = 0; i < numnodes; i++) {
+        cout << "Node " << i << ": ";
+        cout << nodes[i].color << ", ";
+        cout << nodes[i].tempcolor << ", ";
+        cout << nodes[i].randkey << endl;
+    }
+    for(int i = 0; i < numnodes; i++) {
+        for(int j = 0; j < numnodes; j++) {
+            if(neighbors[i][j]) 
+                cout << "1 ";
+            else
+                cout << "0 ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+}

@@ -1,6 +1,6 @@
-#include "network.h"
+#include "verifier.h"
+#include "prover.h"
 
-#include <iostream>
 #include <limits>
 
 using namespace std;
@@ -317,10 +317,37 @@ void TestSolve() {
         cout << "NO SOLUTION" << endl;
 }
 
+void TestReadGraph(ifstream& infile) {
+    cout << "\n============================" << endl;
+    cout << "TESTING GRAPH READING AND SENDING:" << endl;
+    if(!fork()) {
+        Prover* peggy = new Prover();
+        peggy->RecvAndSolveGraph();
+        peggy->PrintGraph();
+        delete peggy;
+        exit(0);
+    }
+    usleep(1000);
+    Verifier* victor = new Verifier(infile);
+    victor->SendGraph();
+    delete victor;
+}
+
 int main(int argc, char*argv[]) {
+    bool canrun = true;
+    if(2 != argc) {
+        cout << "usage: ./test <graph file>" << endl;
+        cout << "Not running tests which involve graph reading." << endl;
+        canrun = false;
+    }
     srand((unsigned int)time(NULL));
     TestSendGraph();
     usleep(1000);
     TestSolve();
     usleep(1000);
+    if(canrun) {
+        ifstream infile;
+        infile.open(argv[1]);
+        TestReadGraph(infile);
+    }
 }

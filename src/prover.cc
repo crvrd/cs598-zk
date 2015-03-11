@@ -4,7 +4,20 @@
 using namespace std;
 
 Prover::Prover() {
+    network.Start();
+}
 
+Prover::~Prover() {
+    network.Close();
+}
+
+bool Prover::RecvAndSolveGraph() {
+    int nodenum;
+    network.RecvInt(&nodenum);
+
+    g = new Graph(nodenum);
+    network.RecvGraph(g);
+    return true;
 }
 
 bool Prover::SendSolvedSignal() {
@@ -25,4 +38,8 @@ bool Prover::SendVerification() {
 
 bool Prover::SendResult() {
     return true;
+}
+
+void Prover::PrintGraph() {
+    g->Print();
 }
