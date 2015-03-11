@@ -192,6 +192,8 @@ void TestSendGraph() {
         }
         cout << endl;
     }
+    cout << "numneighbors: " << g->numneighbors << endl;
+    cout << "numnodes: " << g->numnodes << endl;
     cout << endl;
 
     Graph* h = new Graph(8);
@@ -238,6 +240,8 @@ void TestSendGraph() {
                 }
             }
         }
+        cout << "numneighbors: " << h->numneighbors << endl;
+        cout << "numnodes: " << h->numnodes << endl;
         cout << "CORRECT" << endl;
         receiver.Close();
         exit(0);
@@ -314,6 +318,7 @@ void TestReadGraph(ifstream& infile) {
         peggy->GenerateCommitment();
         peggy->PrintGraph();
         peggy->SendGraphCommitment();
+        peggy->Prove();
         delete peggy;
         exit(0);
     }
@@ -322,6 +327,10 @@ void TestReadGraph(ifstream& infile) {
     victor->SendGraph();
     victor->RecvGraphCommitment();
     victor->PrintGraph();
+    if(victor->Verify())
+        cout << "verification is good!" << endl;
+    else
+        cout << "verification is bad!" << endl;
     delete victor;
 }
 

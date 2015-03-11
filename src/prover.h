@@ -12,8 +12,8 @@ public:
     bool RecvAndSolveGraph();
     void GenerateCommitment();
     bool SendGraphCommitment();
-    bool RecvVerRequest(Node* one, Node* two);
-    bool SendVerification();
+    bool Prove();
+    bool RespondVerRequest();
     bool SendResult();
     void PrintGraph();
 private:

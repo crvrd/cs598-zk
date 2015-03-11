@@ -43,6 +43,8 @@ public:
     bool RecvGraph(Graph* g);
     bool SendCommitment(Graph* g);
     bool RecvCommitment(Graph* g);
+    bool SendProof(Graph* g, int idx);
+    bool RecvProof(Graph* g, int idx);
 private:
     bool SendNode(Node n);
     bool RecvNode(Node* n);

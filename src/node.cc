@@ -25,17 +25,14 @@ bool Node::GenHash() {
 
     if(!SHA256_Final(commithash, &context))
         return false;
-    for(int i = 0; i < SHA256_DIGEST_LENGTH; i++)
-        cout << commithash[i];
-    cout << endl;
     return true;
 }
 
-bool Node::VerHash(int32_t col, uint64_t key) {
+bool Node::VerHash() {
     unsigned char checkhash[SHA256_DIGEST_LENGTH];
     unsigned char input[12];
-    memcpy(input, &col, 4);
-    memcpy(input+4, &key, 8);
+    memcpy(input, &color, 4);
+    memcpy(input+4, &randkey, 8);
 
     SHA256_CTX context;
     if(!SHA256_Init(&context))
@@ -48,11 +45,9 @@ bool Node::VerHash(int32_t col, uint64_t key) {
         return false;
     
     for(int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
-        cout << checkhash[i];
         if(checkhash[i] != commithash[i])
             return false;
     }
-    cout << endl;
     return true;
 }
 

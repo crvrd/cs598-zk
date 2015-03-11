@@ -11,8 +11,9 @@ Verifier::Verifier(ifstream& infile) {
     for(int i = 0; i < nodenum; i++) {
         for(int j = 0; j < nodenum; j++) {
             infile >> neighborval;
-            if(neighborval)
+            if(neighborval) {
                 g->AssignNeighbors(i, j);
+            }
         }
     }
     network.Connect();
@@ -32,8 +33,29 @@ bool Verifier::RecvGraphCommitment() {
     return network.RecvCommitment(g);
 }
 
-bool Verifier::SendVerRequest() {
+bool Verifier::Verify() {
+    int32_t numrequests = pow((g->numneighbors)/2, 2);
+    for(int i = 0; i < numrequests; i++) {
+        RecvGraphCommitment();
+        if(!SendVerRequest())
+            return false;
+    }
     return true;
+}
+
+bool Verifier::SendVerRequest() {
+    int none, ntwo;
+    none = (rand() % g->numnodes);
+    do {
+        ntwo = (rand() % g->numnodes);
+    } while(!g->neighbors[none][ntwo]);
+    network.SendInt(none);
+    network.SendInt(ntwo);
+    network.RecvProof(g, none);
+    network.RecvProof(g, ntwo);
+    if(g->nodes[none].color == g->nodes[ntwo].color)
+        return false;
+    return (g->nodes[none].VerHash() && g->nodes[ntwo].VerHash());
 }
 
 bool Verifier::RecvVerification() {

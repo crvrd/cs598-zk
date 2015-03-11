@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <math.h>
 
 #include "network.h"
 
@@ -16,6 +17,7 @@ public:
     ~Verifier();
     bool SendGraph();
     bool RecvGraphCommitment();
+    bool Verify();
     bool SendVerRequest();
     bool RecvVerification();
     bool RecvResult();

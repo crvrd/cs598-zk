@@ -165,13 +165,15 @@ bool Network::RecvNeighbors(Graph* g) {
                 return false;
         }
     }
-    return false;
+    return true;
 }
 
 bool Network::SendGraph(Graph* g) {
     if(!SendNodes(g)) 
         return false;
     if(!SendNeighbors(g))
+        return false;
+    if(!SendInt(g->numneighbors))
         return false;
     return true;
 }
@@ -180,6 +182,8 @@ bool Network::RecvGraph(Graph* g) {
     if(!RecvNodes(g)) 
         return false;
     if(!RecvNeighbors(g))
+        return false;
+    if(!RecvInt(&g->numneighbors))
         return false;
     return true;
 }
@@ -250,6 +254,22 @@ bool Network::SendNodeCommit(Graph* g, int idx) {
 bool Network::RecvNodeCommit(Graph* g, int idx) {
     unsigned char* torecv = g->nodes[idx].commithash;
     if(recv(sockfd, torecv, SHA256_DIGEST_LENGTH, 0) < 0)
+        return false;
+    return true;
+}
+
+bool Network::SendProof(Graph* g, int idx) {
+    if(!SendInt(g->nodes[idx].color))
+        return false;
+    if(!SendKey(g->nodes[idx].randkey))
+        return false;
+    return true;
+}
+
+bool Network::RecvProof(Graph* g, int idx) {
+    if(!RecvInt(&g->nodes[idx].color))
+        return false;
+    if(!RecvKey(&g->nodes[idx].randkey))
         return false;
     return true;
 }

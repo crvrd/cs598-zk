@@ -15,6 +15,7 @@ public:
     void GenCommitment();
     void Print();
     int numnodes;
+    int numneighbors;
     Node* nodes;
     bool** neighbors;
 private:

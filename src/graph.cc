@@ -6,6 +6,7 @@ Graph::Graph(int nodenum) {
     numnodes = nodenum;
     nodes = new Node[numnodes];
     neighbors = new bool*[numnodes];
+    numneighbors = 0;
     for(int i = 0; i < numnodes; i++) {
         neighbors[i] = new bool[numnodes];
         for(int j = 0; j < numnodes; j++) {
@@ -23,11 +24,13 @@ Graph::~Graph() {
 void Graph::AssignNeighbors(int i, int j) {
     neighbors[i][j] = true;
     neighbors[j][i] = true;
+    numneighbors++;
 }
 
 void Graph::UnassignNeighbors(int i, int j) {
     neighbors[i][j] = false;
     neighbors[j][i] = false;
+    numneighbors--;
 }
 
 // Brute-force Solving (TODO: actually solve)
@@ -84,7 +87,7 @@ void Graph::GenCommitment() {
         nodes[i].GenHash();
     }
     for(int i = 0; i < numnodes; i++) {
-        if(!nodes[i].VerHash(nodes[i].color, nodes[i].randkey))
+        if(!nodes[i].VerHash())
             cout << "PROBLEM" << endl;
     }
 }

@@ -14,7 +14,7 @@ public:
     Node();
     Node(int col);
     bool GenHash();
-    bool VerHash(int32_t col, uint64_t key);
+    bool VerHash();
     void Randomize(int32_t* colormap);
 
     int32_t color;
