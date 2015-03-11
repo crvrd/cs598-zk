@@ -13,7 +13,11 @@ Verifier asks the prover to prove that a specific graph is n-colorable.  The pro
 	* ~~Verifier requests an edge~~
 	* ~~Prover sends the colors and random strings for the two corresponding vertices~~
 	* ~~Verifier verifies the commitment corresponds to two differently-colored vertices~~
-* If all of the |E|^2 requests are verified, the verifier considers the graph colorability to be proven
+* ~~If all of the |E|^2 requests are verified, the verifier considers the graph colorability to be proven~~
 * Generate visualization of graph in python
-
-	
+* Various demos:
+    * Correct prover and verifier
+    * Cheating prover
+    * Cheating verifier?
+* Write-up
+* Code cleanup and comments
