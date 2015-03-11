@@ -2,6 +2,7 @@
 
 using namespace std;
 
+// Create an empty graph with the appropriate number of nodes
 Graph::Graph(int nodenum) {
     numnodes = nodenum;
     nodes = new Node[numnodes];
@@ -21,19 +22,21 @@ Graph::~Graph() {
     }
 }
 
+// Mark two nodes as being adjacent
 void Graph::AssignNeighbors(int i, int j) {
     neighbors[i][j] = true;
     neighbors[j][i] = true;
     numneighbors++;
 }
 
+// Mark two nodes as being distant (not often used)
 void Graph::UnassignNeighbors(int i, int j) {
     neighbors[i][j] = false;
     neighbors[j][i] = false;
     numneighbors--;
 }
 
-// Brute-force Solving (TODO: actually solve)
+// Brute-force solving the coloring problem (TODO: actually solve)
 bool Graph::Solve(int idx) {
     if(idx == numnodes)
         return TestSolution();
@@ -46,6 +49,8 @@ bool Graph::Solve(int idx) {
 
 }
 
+// Make sure all neighbors are of different color
+// used to test our solution
 bool Graph::VerifyNode(int node) {
     for(int i = 0; i < numnodes; i++) {
         if(neighbors[node][i]) {
@@ -56,6 +61,8 @@ bool Graph::VerifyNode(int node) {
     return true;
 }
 
+// Make sure the solution we found works,
+// meaning all neighbors are of different colors
 bool Graph::TestSolution() {
     for(int i = 0; i < numnodes; i++) {
         if(!VerifyNode(i)) {
@@ -70,7 +77,11 @@ bool Graph::TestSolution() {
     return true;
 }
 
+// Generate a commitment for the graph
+// This randomizes the colors, and re-assigns new random 
+// values to the nodes, and re-generates hashes
 void Graph::GenCommitment() {
+    // Randomize the colors, so the client can't link rounds
     colormap[0] = ((rand() % 3) + 1);
     do {
         colormap[1] = ((rand() % 3) + 1);
@@ -82,16 +93,16 @@ void Graph::GenCommitment() {
     else
         colormap[2] = 3;
 
+    // Generate random keys and hashes for nodes
     for(int i = 0; i < numnodes; i++) {
         nodes[i].Randomize(colormap);
         nodes[i].GenHash();
     }
-    for(int i = 0; i < numnodes; i++) {
-        if(!nodes[i].VerHash())
-            cout << "PROBLEM" << endl;
-    }
 }
 
+// Print out the graph
+// Prints out a list of all the nodes and associated values
+// Also prints out a matrix for neighbors
 void Graph::Print() {
     for(int i = 0; i < numnodes; i++) {
         cout << "Node " << i << ": ";

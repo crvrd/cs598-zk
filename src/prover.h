@@ -16,7 +16,6 @@ public:
     bool SendGraphCommitment();
     bool Prove();
     bool RespondVerRequest();
-    bool SendResult();
     void PrintGraph();
     void CorruptSolution();
     void CheatProof();

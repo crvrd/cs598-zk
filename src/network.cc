@@ -5,10 +5,11 @@ using namespace std;
 //serv = should act as server, otherwise act as client.
 Network::Network() {}
 
+// Start listening, and accept incoming connections.
+// This is called by the server
 bool Network::Start() {
     int tempsock;
     struct addrinfo messages, *servinfo, *p;
-    //char s[INET6_ADDRSTRLEN];
     int sockreuse = 1;
     int rv;
 
@@ -68,10 +69,11 @@ bool Network::Start() {
     return true;
 }
 
+// Overloaded start, for if we need a different port.  i.e., we have
+// multiple servers.
 bool Network::Start(char* port) {
     int tempsock;
     struct addrinfo messages, *servinfo, *p;
-    //char s[INET6_ADDRSTRLEN];
     int sockreuse = 1;
     int rv;
 
@@ -128,10 +130,11 @@ bool Network::Start(char* port) {
     return true;
 }
 
+// Connect to a server.
+// This is called by the client
 bool Network::Connect() {
     struct addrinfo messages, *servinfo, *p;
     int rv;
-    //char s[INET6_ADDRSTRLEN];
 
     memset(&messages, 0, sizeof messages);
     messages.ai_family = AF_UNSPEC;
@@ -142,7 +145,6 @@ bool Network::Connect() {
         return -1;
     }
 
-    // loop through all the results and connect to the first we can
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                 p->ai_protocol)) == -1) {
@@ -164,18 +166,14 @@ bool Network::Connect() {
         return false;
     }
 
-    /*inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
-            s, sizeof s);
-    printf("client: connecting to %s\n", s);*/
-
     freeaddrinfo(servinfo);
     return true;
 }
 
+// Overloaded connect function
 bool Network::Connect(char* hostname, char* port) {
     struct addrinfo messages, *servinfo, *p;
     int rv;
-    //char s[INET6_ADDRSTRLEN];
 
     memset(&messages, 0, sizeof messages);
     messages.ai_family = AF_UNSPEC;
@@ -186,7 +184,6 @@ bool Network::Connect(char* hostname, char* port) {
         return -1;
     }
 
-    // loop through all the results and connect to the first we can
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                 p->ai_protocol)) == -1) {
@@ -208,24 +205,23 @@ bool Network::Connect(char* hostname, char* port) {
         return false;
     }
 
-    /*inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
-            s, sizeof s);
-    printf("client: connecting to %s\n", s);*/
-
     freeaddrinfo(servinfo);
     return true;
 }
 
+// Close the connection
 void Network::Close() {
     close(sockfd);
 }
 
+// Send an int across the socket
 bool Network::SendInt(int32_t i) {
     if(send(sockfd, &i, sizeof(int32_t), 0) == -1)
         return false;
     return true;
 }
 
+// Receive an int from the socket
 bool Network::RecvInt(int32_t* i) {
     if(NULL == i)
         return false;
@@ -234,6 +230,7 @@ bool Network::RecvInt(int32_t* i) {
     return true;
 }
 
+// Send all the nodes in a graph 
 bool Network::SendNodes(Graph* g) {
     if(!SendInt(g->numnodes))
         return false;
@@ -254,6 +251,7 @@ bool Network::RecvNodes(Graph* g) {
     return true;
 }
 
+// Send the neighbor matrix
 bool Network::SendNeighbors(Graph* g) {
     for(int i = 0; i < g->numnodes; i++) {
         for(int j = 0; j < g->numnodes; j++) {
@@ -274,6 +272,7 @@ bool Network::RecvNeighbors(Graph* g) {
     return true;
 }
 
+// Send an entire graph
 bool Network::SendGraph(Graph* g) {
     if(!SendNodes(g)) 
         return false;
@@ -294,6 +293,7 @@ bool Network::RecvGraph(Graph* g) {
     return true;
 }
 
+// Send a bool
 bool Network::SendBool(bool b) {
     if(send(sockfd, &b, sizeof(bool), 0) == -1)
         return false;
@@ -306,6 +306,7 @@ bool Network::RecvBool(bool* b) {
     return true;
 }
 
+// Send a single node
 bool Network::SendNode(Node n) {
     if(!SendInt(n.color))
         return false;
@@ -322,6 +323,7 @@ bool Network::RecvNode(Node* n) {
     return true;
 }
 
+// Send a 64-bit random key
 bool Network::SendKey(uint64_t k) {
     if(send(sockfd, &k, sizeof(uint64_t), 0) == -1)
         return false;
@@ -334,6 +336,7 @@ bool Network::RecvKey(uint64_t* k) {
     return true;
 }
 
+// Send the commitment for the whole graph
 bool Network::SendCommitment(Graph* g) {
     for(int i = 0; i < g->numnodes; i++) {
         if(!SendNodeCommit(g, i))
@@ -350,6 +353,7 @@ bool Network::RecvCommitment(Graph* g) {
     return true;
 }
 
+// Send the commitment for an individual node
 bool Network::SendNodeCommit(Graph* g, int idx) {
     unsigned char* tosend = g->nodes[idx].commithash;
     if(send(sockfd, tosend, SHA256_DIGEST_LENGTH, 0) == -1)
@@ -364,6 +368,7 @@ bool Network::RecvNodeCommit(Graph* g, int idx) {
     return true;
 }
 
+// Send the key and color for a node
 bool Network::SendProof(Graph* g, int idx) {
     if(!SendInt(g->nodes[idx].color))
         return false;
