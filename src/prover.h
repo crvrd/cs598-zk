@@ -8,14 +8,19 @@ using namespace std;
 class Prover{
 public:
     Prover();
+    Prover(char* port);
     ~Prover();
     bool RecvAndSolveGraph();
+    bool CheatSolveGraph();
     void GenerateCommitment();
     bool SendGraphCommitment();
     bool Prove();
     bool RespondVerRequest();
     bool SendResult();
     void PrintGraph();
+    void CorruptSolution();
+    void CheatProof();
+    bool CheatVerRequest();
 private:
     Graph* g;
     Network network;

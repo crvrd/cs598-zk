@@ -19,14 +19,31 @@ Verifier::Verifier(ifstream& infile) {
     network.Connect();
 }
 
+Verifier::Verifier(ifstream& infile, char* hostname, char* port) {
+    int nodenum, neighborval;
+    infile >> nodenum;
+    g = new Graph(nodenum);
+    for(int i = 0; i < nodenum; i++) {
+        for(int j = 0; j < nodenum; j++) {
+            infile >> neighborval;
+            if(neighborval) {
+                g->AssignNeighbors(i, j);
+            }
+        }
+    }
+    network.Connect(hostname, port);
+}
+
 Verifier::~Verifier() {
     network.Close();
 }
 
 bool Verifier::SendGraph() {
+    bool colorable;
     network.SendInt(g->numnodes);
     network.SendGraph(g);
-    return true;
+    network.RecvBool(&colorable);
+    return colorable;
 }
 
 bool Verifier::RecvGraphCommitment() {
@@ -56,14 +73,6 @@ bool Verifier::SendVerRequest() {
     if(g->nodes[none].color == g->nodes[ntwo].color)
         return false;
     return (g->nodes[none].VerHash() && g->nodes[ntwo].VerHash());
-}
-
-bool Verifier::RecvVerification() {
-    return true;
-}
-
-bool Verifier::RecvResult() {
-    return true;
 }
 
 void Verifier::PrintGraph() {

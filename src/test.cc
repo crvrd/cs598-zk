@@ -324,7 +324,10 @@ void TestReadGraph(ifstream& infile) {
     }
     usleep(1000);
     Verifier* victor = new Verifier(infile);
-    victor->SendGraph();
+    if(!victor->SendGraph()) {
+        cout << "not 3-colorable!" << endl;
+        exit(-1);
+    }
     victor->RecvGraphCommitment();
     victor->PrintGraph();
     if(victor->Verify())

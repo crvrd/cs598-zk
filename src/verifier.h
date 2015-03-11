@@ -14,13 +14,12 @@ class Verifier{
 public:
     Verifier();
     Verifier(ifstream& infile);
+    Verifier(ifstream& infile, char* hostname, char* port);
     ~Verifier();
     bool SendGraph();
     bool RecvGraphCommitment();
     bool Verify();
     bool SendVerRequest();
-    bool RecvVerification();
-    bool RecvResult();
     void PrintGraph();
 private:
     Graph* g;

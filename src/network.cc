@@ -68,6 +68,66 @@ bool Network::Start() {
     return true;
 }
 
+bool Network::Start(char* port) {
+    int tempsock;
+    struct addrinfo messages, *servinfo, *p;
+    //char s[INET6_ADDRSTRLEN];
+    int sockreuse = 1;
+    int rv;
+
+    memset(&messages, 0, sizeof messages);
+    messages.ai_family = AF_INET;
+    messages.ai_socktype = SOCK_STREAM;
+
+    if ((rv = getaddrinfo(NULL, port, &messages, &servinfo)) != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+        return -1;
+    }
+
+    for(p = servinfo; p != NULL; p = p->ai_next) {
+        if ((tempsock = socket(p->ai_family, p->ai_socktype,
+                p->ai_protocol)) == -1) {
+            perror("server: socket");
+            continue;
+        }
+
+        if (setsockopt(tempsock, SOL_SOCKET, SO_REUSEADDR, &sockreuse,
+                sizeof(int)) == -1) {
+            perror("setsockopt");
+            exit(-1);
+        }
+
+        if (bind(tempsock, p->ai_addr, p->ai_addrlen) == -1) {
+            close(tempsock);
+            perror("server: bind");
+            continue;
+        }
+
+        break;
+    }
+
+    if (p == NULL)  {
+        fprintf(stderr, "server: failed to bind\n");
+        return false;
+    }
+
+    freeaddrinfo(servinfo); // all done with this structure
+
+    if (listen(tempsock, BACKLOG) == -1) {
+        perror("listen");
+        exit(1);
+    }
+
+
+    sin_size = sizeof(their_addr);
+
+    sockfd = accept(tempsock, (struct sockaddr*)&their_addr, &sin_size);
+    if(-1 == sockfd)
+        perror("accept");
+    close(tempsock);
+    return true;
+}
+
 bool Network::Connect() {
     struct addrinfo messages, *servinfo, *p;
     int rv;
@@ -78,6 +138,50 @@ bool Network::Connect() {
     messages.ai_socktype = SOCK_STREAM;
 
     if ((rv = getaddrinfo(PROOF_HOST, PROOF_PORT, &messages, &servinfo)) != 0) {
+        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+        return -1;
+    }
+
+    // loop through all the results and connect to the first we can
+    for(p = servinfo; p != NULL; p = p->ai_next) {
+        if ((sockfd = socket(p->ai_family, p->ai_socktype,
+                p->ai_protocol)) == -1) {
+            perror("client: socket");
+            continue;
+        }
+
+        if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+            close(sockfd);
+            perror("client: connect");
+            continue;
+        }
+
+        break;
+    }
+
+    if (p == NULL) {
+        fprintf(stderr, "client: failed to connect\n");
+        return false;
+    }
+
+    /*inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
+            s, sizeof s);
+    printf("client: connecting to %s\n", s);*/
+
+    freeaddrinfo(servinfo);
+    return true;
+}
+
+bool Network::Connect(char* hostname, char* port) {
+    struct addrinfo messages, *servinfo, *p;
+    int rv;
+    //char s[INET6_ADDRSTRLEN];
+
+    memset(&messages, 0, sizeof messages);
+    messages.ai_family = AF_UNSPEC;
+    messages.ai_socktype = SOCK_STREAM;
+
+    if ((rv = getaddrinfo(hostname, port, &messages, &servinfo)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
         return -1;
     }
@@ -123,6 +227,8 @@ bool Network::SendInt(int32_t i) {
 }
 
 bool Network::RecvInt(int32_t* i) {
+    if(NULL == i)
+        return false;
     if(recv(sockfd, i, sizeof(int32_t), 0) < 0)
         return false;
     return true;
