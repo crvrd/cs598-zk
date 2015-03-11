@@ -10,7 +10,7 @@ public:
     Prover();
     ~Prover();
     bool RecvAndSolveGraph();
-    bool SendSolvedSignal();
+    void GenerateCommitment();
     bool SendGraphCommitment();
     bool RecvVerRequest(Node* one, Node* two);
     bool SendVerification();

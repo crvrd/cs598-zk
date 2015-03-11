@@ -41,6 +41,8 @@ public:
     bool RecvNeighbors(Graph* g);
     bool SendGraph(Graph* g);
     bool RecvGraph(Graph* g);
+    bool SendCommitment(Graph* g);
+    bool RecvCommitment(Graph* g);
 private:
     bool SendNode(Node n);
     bool RecvNode(Node* n);
@@ -48,6 +50,8 @@ private:
     bool RecvBool(bool* i);
     bool SendKey(uint64_t k);
     bool RecvKey(uint64_t* k);
+    bool SendNodeCommit(Graph* g, int idx);
+    bool RecvNodeCommit(Graph* g, int idx);
     int sockfd;
     struct sockaddr their_addr;
     socklen_t sin_size;

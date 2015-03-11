@@ -5,6 +5,7 @@ using namespace std;
 
 Prover::Prover() {
     network.Start();
+    SeedRandom();
 }
 
 Prover::~Prover() {
@@ -17,15 +18,15 @@ bool Prover::RecvAndSolveGraph() {
 
     g = new Graph(nodenum);
     network.RecvGraph(g);
-    return true;
+    return g->Solve(0);
 }
 
-bool Prover::SendSolvedSignal() {
-    return true;
+void Prover::GenerateCommitment() {
+    g->GenCommitment();
 }
 
 bool Prover::SendGraphCommitment() {
-    return true;
+    return network.SendCommitment(g);
 }
 
 bool Prover::RecvVerRequest(Node* one, Node* two) {

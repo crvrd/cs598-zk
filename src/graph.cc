@@ -67,11 +67,32 @@ bool Graph::TestSolution() {
     return true;
 }
 
+void Graph::GenCommitment() {
+    colormap[0] = ((rand() % 3) + 1);
+    do {
+        colormap[1] = ((rand() % 3) + 1);
+    } while(colormap[1] == colormap[0]);
+    if(1 != colormap[0] && 1 != colormap[1])
+        colormap[2] = 1;
+    else if(2 != colormap[0] && 2 != colormap[1])
+        colormap[2] = 2;
+    else
+        colormap[2] = 3;
+
+    for(int i = 0; i < numnodes; i++) {
+        nodes[i].Randomize(colormap);
+        nodes[i].GenHash();
+    }
+    for(int i = 0; i < numnodes; i++) {
+        if(!nodes[i].VerHash(nodes[i].color, nodes[i].randkey))
+            cout << "PROBLEM" << endl;
+    }
+}
+
 void Graph::Print() {
     for(int i = 0; i < numnodes; i++) {
         cout << "Node " << i << ": ";
         cout << nodes[i].color << ", ";
-        cout << nodes[i].tempcolor << ", ";
         cout << nodes[i].randkey << endl;
     }
     for(int i = 0; i < numnodes; i++) {

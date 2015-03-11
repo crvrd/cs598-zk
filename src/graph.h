@@ -12,11 +12,13 @@ public:
     void AssignNeighbors(int i, int j);
     void UnassignNeighbors(int i, int j);
     bool Solve(int idx);
+    void GenCommitment();
     void Print();
     int numnodes;
     Node* nodes;
     bool** neighbors;
 private:
+    int32_t colormap[3];
     bool VerifyNode(int node);
     bool TestSolution();
 };

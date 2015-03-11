@@ -9,7 +9,7 @@ Verifier asks the prover to prove that a specific graph is n-colorable.  The pro
 * ~~Verifier sends prover the graph~~
 * ~~Prover finds an n-coloring for the graph~~
 * For |E|^2 rounds:
-	* Prover generates a commitment for each edge of the graph, and sends them to the verifier
+	* ~~Prover generates a commitment for each edge of the graph, and sends them to the verifier~~
 	* Verifier requests an edge
 	* Prover sends the colors and random strings for the two corresponding vertices
 	* Verifier verifies the commitment corresponds to two differently-colored vertices

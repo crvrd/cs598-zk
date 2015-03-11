@@ -28,12 +28,8 @@ bool Verifier::SendGraph() {
     return true;
 }
 
-bool Verifier::RecvSolvedSignal() {
-    return true;
-}
-
 bool Verifier::RecvGraphCommitment() {
-    return true;
+    return network.RecvCommitment(g);
 }
 
 bool Verifier::SendVerRequest() {

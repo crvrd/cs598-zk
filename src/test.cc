@@ -10,7 +10,7 @@ void TestInts() {
     cout << "TESTING NETWORK SENDINT:" << endl;
 
     int tosend = rand();
-    int torecv = 0;
+    int torecv = 0; 
 
     if(!fork()) {
         Network receiver;
@@ -111,13 +111,12 @@ void TestNodes() {
 
     Graph* g = new Graph(8);
     for(int i = 0; i < 8; i++) {
-        g->nodes[i] = Node(rand()%3 + 1, rand()%3 + 1);
+        g->nodes[i] = Node(rand()%3 + 1);
         g->nodes[i].randkey = (uint64_t)rand();
     }
     for(int i = 0; i < g->numnodes; i++) {
         cout << "Node " << i << ": ";
         cout << g->nodes[i].color << ", ";
-        cout << g->nodes[i].tempcolor << ", ";
         cout << g->nodes[i].randkey << endl;
     }
     cout << endl;
@@ -134,16 +133,10 @@ void TestNodes() {
         for(int i = 0; i < h->numnodes; i++) {
             cout << "Node " << i << ": ";
             cout << h->nodes[i].color << ", ";
-            cout << h->nodes[i].tempcolor << ", ";
             cout << h->nodes[i].randkey << endl;
         }
         for(int i = 0; i < 8; i++) {
             if(h->nodes[i].color != g->nodes[i].color) {
-                cout << "INCORRECT" << endl;
-                receiver.Close();
-                exit(0);
-            }
-            if(h->nodes[i].tempcolor != g->nodes[i].tempcolor) {
                 cout << "INCORRECT" << endl;
                 receiver.Close();
                 exit(0);
@@ -174,13 +167,12 @@ void TestSendGraph() {
 
     Graph* g = new Graph(8);
     for(int i = 0; i < 8; i++) {
-        g->nodes[i] = Node(rand()%3 + 1, rand()%3 + 1);
+        g->nodes[i] = Node(rand()%3 + 1);
         g->nodes[i].randkey = (uint64_t)rand();
     }
     for(int i = 0; i < g->numnodes; i++) {
         cout << "Node " << i << ": ";
         cout << g->nodes[i].color << ", ";
-        cout << g->nodes[i].tempcolor << ", ";
         cout << g->nodes[i].randkey << endl;
     }
     for(int i = 0; i < 8; i++) {
@@ -214,16 +206,10 @@ void TestSendGraph() {
         for(int i = 0; i < h->numnodes; i++) {
             cout << "Node " << i << ": ";
             cout << h->nodes[i].color << ", ";
-            cout << h->nodes[i].tempcolor << ", ";
             cout << h->nodes[i].randkey << endl;
         }
         for(int i = 0; i < 8; i++) {
             if(h->nodes[i].color != g->nodes[i].color) {
-                cout << "INCORRECT" << endl;
-                receiver.Close();
-                exit(0);
-            }
-            if(h->nodes[i].tempcolor != g->nodes[i].tempcolor) {
                 cout << "INCORRECT" << endl;
                 receiver.Close();
                 exit(0);
@@ -322,14 +308,20 @@ void TestReadGraph(ifstream& infile) {
     cout << "TESTING GRAPH READING AND SENDING:" << endl;
     if(!fork()) {
         Prover* peggy = new Prover();
-        peggy->RecvAndSolveGraph();
+        if(!peggy->RecvAndSolveGraph())
+            cout << "couldn't solve" << endl;
         peggy->PrintGraph();
+        peggy->GenerateCommitment();
+        peggy->PrintGraph();
+        peggy->SendGraphCommitment();
         delete peggy;
         exit(0);
     }
     usleep(1000);
     Verifier* victor = new Verifier(infile);
     victor->SendGraph();
+    victor->RecvGraphCommitment();
+    victor->PrintGraph();
     delete victor;
 }
 
@@ -340,7 +332,7 @@ int main(int argc, char*argv[]) {
         cout << "Not running tests which involve graph reading." << endl;
         canrun = false;
     }
-    srand((unsigned int)time(NULL));
+    SeedRandom();
     TestSendGraph();
     usleep(1000);
     TestSolve();
@@ -350,4 +342,5 @@ int main(int argc, char*argv[]) {
         infile.open(argv[1]);
         TestReadGraph(infile);
     }
+    usleep(1000);
 }

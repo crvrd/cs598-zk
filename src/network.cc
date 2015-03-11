@@ -199,8 +199,6 @@ bool Network::RecvBool(bool* b) {
 bool Network::SendNode(Node n) {
     if(!SendInt(n.color))
         return false;
-    if(!SendInt(n.tempcolor))
-        return false;
     if(!SendKey(n.randkey))
         return false;
     return true;
@@ -208,8 +206,6 @@ bool Network::SendNode(Node n) {
 
 bool Network::RecvNode(Node* n) {
     if(!RecvInt(&n->color))
-        return false;
-    if(!RecvInt(&n->tempcolor))
         return false;
     if(!RecvKey(&n->randkey))
         return false;
@@ -224,6 +220,36 @@ bool Network::SendKey(uint64_t k) {
 
 bool Network::RecvKey(uint64_t* k) {
     if(recv(sockfd, k, sizeof(uint64_t), 0) < 0)
+        return false;
+    return true;
+}
+
+bool Network::SendCommitment(Graph* g) {
+    for(int i = 0; i < g->numnodes; i++) {
+        if(!SendNodeCommit(g, i))
+            return false;
+    }
+    return true;
+}
+
+bool Network::RecvCommitment(Graph* g) {
+    for(int i = 0; i < g->numnodes; i++) {
+        if(!RecvNodeCommit(g, i))
+            return false;
+    }
+    return true;
+}
+
+bool Network::SendNodeCommit(Graph* g, int idx) {
+    unsigned char* tosend = g->nodes[idx].commithash;
+    if(send(sockfd, tosend, SHA256_DIGEST_LENGTH, 0) == -1)
+        return false;
+    return true;
+}
+
+bool Network::RecvNodeCommit(Graph* g, int idx) {
+    unsigned char* torecv = g->nodes[idx].commithash;
+    if(recv(sockfd, torecv, SHA256_DIGEST_LENGTH, 0) < 0)
         return false;
     return true;
 }

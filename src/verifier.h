@@ -15,7 +15,6 @@ public:
     Verifier(ifstream& infile);
     ~Verifier();
     bool SendGraph();
-    bool RecvSolvedSignal();
     bool RecvGraphCommitment();
     bool SendVerRequest();
     bool RecvVerification();
