@@ -16,6 +16,7 @@ bool Network::Start() {
     memset(&messages, 0, sizeof messages);
     messages.ai_family = AF_INET;
     messages.ai_socktype = SOCK_STREAM;
+    messages.ai_flags = AI_PASSIVE;
 
     if ((rv = getaddrinfo(NULL, PROOF_PORT, &messages, &servinfo)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
@@ -80,6 +81,7 @@ bool Network::Start(char* port) {
     memset(&messages, 0, sizeof messages);
     messages.ai_family = AF_INET;
     messages.ai_socktype = SOCK_STREAM;
+    messages.ai_flags = AI_PASSIVE;
 
     if ((rv = getaddrinfo(NULL, port, &messages, &servinfo)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
