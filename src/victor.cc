@@ -28,7 +28,8 @@ int main(int argc, char* argv[]) {
             continue;
         }
         if(!victor->VerifyEdgeRequests()) {
-            std::cout << "Graph verification Failed." << std::endl;
+            std::cout << "Graph verification Failed; ";
+            std::cout << "prover is probably cheating." << std::endl;
             delete victor;
             continue;
         }

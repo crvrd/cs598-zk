@@ -7,10 +7,10 @@ class Prover{
 public:
     Prover(std::ifstream& infile);
     ~Prover();
-    bool SolveGraph();
+    bool SolveGraph(bool cheat);
     bool BeginExchange(int k, int j, char* hostname, char* port);
     bool GenerateCommitments();
-    bool ProcessEdgeRequests();
+    bool ProcessEdgeRequests(bool cheat);
 private:
     int32_t* requests;
     int commitnum;

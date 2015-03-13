@@ -1,9 +1,9 @@
 #include "prover.h"
 
 int main(int argc, char* argv[]) {
-    if(6 != argc) {
+    if(7 != argc) {
         std::cout << "usage: ./peggy <hostname> <port> <graph file> ";
-        std::cout << "<security: low> <security: high>" << std::endl;
+        std::cout << "<security: low> <security: high> <cheat>" << std::endl;
         exit(-1);
     }
 
@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Problem opening file, exiting." << std::endl;
         exit(-1);
     }
-
+    bool cheat = !(std::string(argv[6]) == "0");
     Prover* peggy;
     try {
         peggy = new Prover(infile);
@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Could not initialize network connection." << std::endl;
         exit(-1);
     }
-    if(!peggy->SolveGraph()) {
+    if(!peggy->SolveGraph(cheat)) {
         std::cout << "No solution." << std::endl;
         delete peggy;
         exit(0);
@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
         delete peggy;
         exit(-1);
     }
-    if(!peggy->ProcessEdgeRequests()) {
+    if(!peggy->ProcessEdgeRequests(cheat)) {
         std::cout << "Edge requests failed, probable non-edge query";
         std::cout << std::endl;
         delete peggy;

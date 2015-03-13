@@ -24,8 +24,10 @@ Prover::~Prover() {
     network.Close();
 }
 
-bool Prover::SolveGraph() {
-    return g->Solve(0);
+bool Prover::SolveGraph(bool cheat) {
+    if(g->Solve(0) || cheat)
+        return true;
+    return false;
 }
 
 // Connect to the server, and send security param and graph info
@@ -67,7 +69,7 @@ bool Prover::GenerateCommitments() {
 }
 
 // Prove all of the edges are good
-bool Prover::ProcessEdgeRequests() {
+bool Prover::ProcessEdgeRequests(bool cheat) {
     // Receive requests
     requests = new int32_t[commitnum * 2];
     if(!network.RecvBytes(requests, commitnum * 8))
@@ -85,6 +87,8 @@ bool Prover::ProcessEdgeRequests() {
         colors[i*2+1] = graphs[i].vertices[second].color;
         keys[i*2] = graphs[i].vertices[first].randkey;
         keys[i*2+1] = graphs[i].vertices[second].randkey;
+        if(cheat && (colors[i*2] == colors[i*2+1]))
+            colors[i*2] = (colors[1*2+1]%3) + 1;
     }
 
     // Send responses
