@@ -48,6 +48,7 @@ bool Prover::BeginExchange(int k, int j, char* hostname, char* port) {
     sec = avg(max(k, theirk), min(j, theirj));
     commitnum = sec*g->numedges;
     std::cout << "parameter: " << sec << std::endl;
+    std::cout << commitnum << std::endl;
     if(!network.SendInt(g->numvertices))
         return false;
     return network.SendGraph(g);
@@ -56,7 +57,6 @@ bool Prover::BeginExchange(int k, int j, char* hostname, char* port) {
 
 // Make commitment hashes for all of the graphs
 bool Prover::GenerateCommitments() {
-    std::cout << commitnum << std::endl;
     graphs = new Graph[commitnum];
     for(int i = 0; i < commitnum; i++) {
         graphs[i] = *g;
