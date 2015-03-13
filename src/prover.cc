@@ -47,8 +47,6 @@ bool Prover::BeginExchange(int k, int j, char* hostname, char* port) {
         return false;
     sec = avg(max(k, theirk), min(j, theirj));
     commitnum = sec*g->numedges;
-    std::cout << "parameter: " << sec << std::endl;
-    std::cout << commitnum << std::endl;
     if(!network.SendInt(g->numvertices))
         return false;
     return network.SendGraph(g);

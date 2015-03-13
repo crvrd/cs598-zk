@@ -45,7 +45,6 @@ void Verifier::GenerateEdgeRequests() {
         requests[i*2] = j;
         requests[i*2+1] = k;
     }
-    std::cout << commitnum << std::endl;
 }
 
 // Get the graph commitments from the prover
