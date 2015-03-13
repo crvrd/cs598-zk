@@ -28,6 +28,8 @@ public:
     bool RecvGraph(Graph* g);
     bool SendCommitment(Graph* g);
     bool RecvCommitment(Graph* g);
+    bool SendKey(uint64_t k);
+    bool RecvKey(uint64_t* k);
 private:
     bool SendVertex(Vertex n);
     bool RecvVertex(Vertex* n);
@@ -37,8 +39,6 @@ private:
     bool RecvBool(bool* i);
     bool SendEdges(Graph* g);
     bool RecvEdges(Graph* g);
-    bool SendKey(uint64_t k);
-    bool RecvKey(uint64_t* k);
     bool SendVertexCommit(Graph* g, int idx);
     bool RecvVertexCommit(Graph* g, int idx);
     int sockfd;
