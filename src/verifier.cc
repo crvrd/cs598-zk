@@ -61,68 +61,31 @@ bool Verifier::RecvCommitments() {
 
 // Send the prover all of our requests
 bool Verifier::SendEdgeRequests() {
-    for(int i = 0; i < commitnum; i++) {
-        if(!network.SendInt(requests[i*2]))
-            return false;
-        if(!network.SendInt(requests[i*2+1]))
-            return false;
-    }
-    /*if(!network.SendBytes(requests, commitnum * 8))
-        return false;*/
+    if(!network.SendBytes(requests, commitnum * 8))
+        return false;
     return true;
 }
 
 bool Verifier::VerifyEdgeRequests() {
     // Get colors and random keys
-    /*int32_t colors[commitnum * 2];
+    int32_t colors[commitnum * 2];
     uint64_t keys[commitnum * 2];
     if(!network.RecvBytes((char*)colors, commitnum * 8))
         return false;
-    std::cout << "heren" << std::endl;
-    std::cout << "heret" << std::endl;
-    //if(!network.RecvBytes((char*)keys, commitnum * 16))
-    //    return false;
-    std::cout << "heref" << std::endl;
+    if(!network.RecvBytes((char*)keys, commitnum * 16))
+        return false;
 
     // Assign colors and keys, and verify
     for(int i = 0; i < commitnum; i++) {
         int first = requests[i*2];
         int second = requests[i*2+1];
-        std::cout << i << std::endl;
+
         graphs[i].vertices[first].color = colors[i*2];
         graphs[i].vertices[second].color = colors[i*2+1];
         graphs[i].vertices[first].randkey = keys[i*2];
         graphs[i].vertices[second].randkey = keys[i*2+1];
-        std::cout << i << std::endl;
-        std::cout << graphs[i].vertices[first].color << " ";
-        std::cout << graphs[i].vertices[second].color << " ";
-        std::cout << graphs[i].vertices[first].randkey << " ";
-        std::cout << graphs[i].vertices[second].randkey << std::endl;
         if(graphs[i].vertices[first].color == graphs[i].vertices[second].color)
             return false;
-        std::cout << i << std::endl;
-        if(!(graphs[i].vertices[first].VerHash() && graphs[i].vertices[second].VerHash()))
-            return false;
-    }*/
-
-    for(int i = 0; i < commitnum; i++) {
-        int first = requests[i*2];
-        int second = requests[i*2+1];
-        if(!network.RecvInt(&graphs[i].vertices[first].color))
-            return false;
-        if(!network.RecvInt(&graphs[i].vertices[second].color))
-            return false;
-        if(!network.RecvKey(&graphs[i].vertices[first].randkey))
-            return false;
-        if(!network.RecvKey(&graphs[i].vertices[second].randkey))
-            return false;
-        if(graphs[i].vertices[first].color == graphs[i].vertices[second].color)
-            return false;
-        std::cout << i << std::endl;
-        std::cout << graphs[i].vertices[first].color << " ";
-        std::cout << graphs[i].vertices[second].color << " ";
-        std::cout << graphs[i].vertices[first].randkey << " ";
-        std::cout << graphs[i].vertices[second].randkey << std::endl;
         if(!(graphs[i].vertices[first].VerHash() && graphs[i].vertices[second].VerHash()))
             return false;
     }
