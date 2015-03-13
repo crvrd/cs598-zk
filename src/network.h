@@ -21,7 +21,7 @@ public:
     bool Connect(char* hostname, char* port);
     void Close();
     bool SendBytes(void* ptr, int32_t num);
-    bool RecvBytes(void* ptr, int32_t num);
+    bool RecvBytes(char* ptr, int32_t num);
     bool SendInt(int32_t i);
     bool RecvInt(int32_t* i);
     bool SendGraph(Graph* g);

@@ -30,7 +30,6 @@ bool Verifier::BeginExchange(int k, int j) {
     if(!network.RecvGraph(g))
         return false;
     commitnum = sec*g->numedges;
-    std::cout << "parameter: " << sec << std::endl;
     return true;
 }
 
@@ -46,6 +45,7 @@ void Verifier::GenerateEdgeRequests() {
         requests[i*2] = j;
         requests[i*2+1] = k;
     }
+    std::cout << commitnum << std::endl;
 }
 
 // Get the graph commitments from the prover
@@ -70,9 +70,9 @@ bool Verifier::VerifyEdgeRequests() {
     // Get colors and random keys
     int32_t colors[commitnum * 2];
     uint64_t keys[commitnum * 2];
-    if(!network.RecvBytes(colors, commitnum * 8))
+    if(!network.RecvBytes((char*)colors, commitnum * 8))
         return false;
-    if(!network.RecvBytes(keys, commitnum * 16))
+    if(!network.RecvBytes((char*)keys, commitnum * 16))
         return false;
 
     // Assign colors and keys, and verify

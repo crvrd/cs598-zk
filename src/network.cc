@@ -113,9 +113,16 @@ bool Network::SendBytes(void* ptr, int32_t num) {
 }
 
 // Receive a buffer as-is
-bool Network::RecvBytes(void* ptr, int32_t num) {
-    if(recv(sockfd, ptr, num, 0) < 0)
-        return false;
+bool Network::RecvBytes(char* ptr, int32_t num) {
+    int bytesread = 0;
+    int curr = 0;
+    do {
+        curr = recv(sockfd, ptr, num, 0);
+        if(curr < 0) 
+            return false;
+        bytesread += curr;
+        ptr += curr;
+    } while(bytesread < num);
     return true;
 }
 
