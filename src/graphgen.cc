@@ -4,8 +4,8 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
     SeedRandom();
-    if(4 != argc) {
-        cout << "usage: ./graphgen <# of graphs> <# of nodes per graph> <dir>\n";
+    if(5 != argc) {
+        cout << "usage: ./graphgen <# of graphs> <# of nodes per graph> <portion of edges> <dir>\n";
         exit(-1);
     }
 
@@ -14,11 +14,11 @@ int main(int argc, char* argv[]) {
 
     for(int i = 0; i < graphs; i++) {
         ofstream outfile;
-        outfile.open(argv[3] + string("/g") + to_string(i));
+        outfile.open(argv[4] + string("/g") + to_string(i));
 
         Graph* g = new Graph(nodes);
 
-        for(int j = 0; j < nodes*2; j++) {
+        for(int j = 0; j < nodes*atof(argv[3]); j++) {
             int k;
             int l;
             do {

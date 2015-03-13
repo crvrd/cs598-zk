@@ -183,7 +183,7 @@ bool Network::Connect(char* hostname, char* port) {
 
     if ((rv = getaddrinfo(hostname, port, &messages, &servinfo)) != 0) {
         fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-        return -1;
+        return false;
     }
 
     for(p = servinfo; p != NULL; p = p->ai_next) {
@@ -214,6 +214,18 @@ bool Network::Connect(char* hostname, char* port) {
 // Close the connection
 void Network::Close() {
     close(sockfd);
+}
+
+bool Network::SendBytes(void* ptr, int32_t num) {
+    if(send(sockfd, ptr, num, 0) == -1)
+        return false;
+    return true;
+}
+
+bool Network::RecvBytes(void* ptr, int32_t num) {
+    if(recv(sockfd, ptr, num, 0) < 0)
+        return false;
+    return true;
 }
 
 // Send an int across the socket

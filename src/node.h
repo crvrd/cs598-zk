@@ -7,8 +7,6 @@
 #include <cstring>
 #include "utilities.h"
 
-using namespace std;
-
 class Node{
 public:
     Node();

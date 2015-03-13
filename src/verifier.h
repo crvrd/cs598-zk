@@ -13,16 +13,26 @@
 class Verifier{
 public:
     Verifier();
-    Verifier(ifstream& infile);
-    Verifier(ifstream& infile, char* hostname, char* port);
+    Verifier(std::ifstream& infile);
+    Verifier(std::ifstream& infile, char* hostname, char* port);
+    Verifier(char* port);
     ~Verifier();
+    bool BeginExchange(int k);
+    void GenerateRequests();
+    bool RecvCommitments();
+    bool SendRequests();
+    bool VerifyRequests();
+    void WriteGraph(std::ofstream& outfile);
     bool SendGraph();
     bool RecvGraphCommitment();
     bool Verify();
     bool SendVerRequest();
     void PrintGraph();
 private:
+    int* requests;
+    int commitnum;
     Graph* g;
+    Graph* graphs;
     Network network;
 };
 

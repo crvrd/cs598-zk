@@ -25,8 +25,6 @@
 
 #define BACKLOG 10
 
-using namespace std;
-
 class Network{
 public:
     Network();
@@ -35,6 +33,8 @@ public:
     bool Connect();
     bool Connect(char* hostname, char* port);
     void Close();
+    bool SendBytes(void* ptr, int32_t num);
+    bool RecvBytes(void* ptr, int32_t num);
     bool SendInt(int32_t i);
     bool RecvInt(int32_t* i);
     bool SendNodes(Graph* g);

@@ -2,6 +2,11 @@
 
 using namespace std;
 
+Graph::Graph() {
+    numnodes = 0;
+    numneighbors = 0;
+}
+
 // Create an empty graph with the appropriate number of nodes
 Graph::Graph(int nodenum) {
     numnodes = nodenum;
@@ -16,6 +21,22 @@ Graph::Graph(int nodenum) {
     }
 }
 
+Graph::Graph(const Graph &g1) {
+    numnodes = g1.numnodes;
+    numneighbors = g1.numneighbors;
+    nodes = new Node[numnodes];
+    neighbors = new bool*[numnodes];
+    for(int i = 0; i < numnodes; i++) {
+        neighbors[i] = new bool[numnodes];
+        for(int j = 0; j < numnodes; j++) {
+            neighbors[i][j] = g1.neighbors[i][j];
+        }
+    }
+    for(int i = 0; i < 3; i++) {
+        colormap[i] = g1.colormap[i];
+    }
+}
+
 Graph::~Graph() {
     for(int i = 0; i < numnodes; i++) {
         delete[] neighbors[i];
@@ -27,6 +48,10 @@ void Graph::AssignNeighbors(int i, int j) {
     neighbors[i][j] = true;
     neighbors[j][i] = true;
     numneighbors++;
+}
+
+void Graph::NormalizeNeighbors() {
+    numneighbors /= 2;
 }
 
 // Mark two nodes as being distant (not often used)

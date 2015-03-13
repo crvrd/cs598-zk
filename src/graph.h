@@ -3,13 +3,14 @@
 
 #include "node.h"
 
-using namespace std;
-
 class Graph{
 public:
+    Graph();
     Graph(int nodenum);
+    Graph(const Graph &g1);
     ~Graph();
     void AssignNeighbors(int i, int j);
+    void NormalizeNeighbors();
     void UnassignNeighbors(int i, int j);
     bool Solve(int idx);
     void GenCommitment();

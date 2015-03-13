@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <fstream>
 
-using namespace std;
-
 void SeedRandom();
 
 #endif

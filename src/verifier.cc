@@ -36,8 +36,99 @@ Verifier::Verifier(ifstream& infile, char* hostname, char* port) {
     network.Connect(hostname, port);
 }
 
+Verifier::Verifier(char* port) {
+    network.Start(port);
+    SeedRandom();
+}
+
 Verifier::~Verifier() {
     network.Close();
+}
+
+bool Verifier::BeginExchange(int k) {
+    int nodes, theirk;
+    if(!network.RecvInt(&theirk))
+        return false;
+    if(!network.SendInt(k))
+        return false;
+    if(theirk != k)
+        return false;
+    if(!network.RecvInt(&nodes))
+        return false;
+    g = new Graph(nodes);
+    if(!network.RecvGraph(g))
+        return false;
+    commitnum = k*g->numneighbors;
+    return true;
+}
+
+void Verifier::GenerateRequests() {
+    requests = new int32_t[commitnum * 2];
+    for(int i = 0; i < commitnum; i++) {
+        int j,k;
+        do {
+            j = rand() % g->numnodes;
+            k = rand() % g->numnodes;
+        } while(!g->neighbors[j][k]);
+        requests[i*2] = j;
+        requests[i*2+1] = k;
+    }
+}
+
+bool Verifier::RecvCommitments() {
+    graphs = new Graph[commitnum];
+    for(int i = 0; i < commitnum; i++) {
+        graphs[i] = *g;
+        if(!network.RecvCommitment(graphs + i))
+            return false;
+    }
+    return true;
+}
+
+bool Verifier::SendRequests() {
+    if(!network.SendBytes(requests, commitnum * 8))
+        return false;
+    return true;
+}
+
+bool Verifier::VerifyRequests() {
+    // Get colors and random keys
+    int32_t colors[commitnum * 2];
+    uint64_t keys[commitnum * 2];
+    if(!network.RecvBytes(colors, commitnum * 8))
+        return false;
+    if(!network.RecvBytes(keys, commitnum * 16))
+        return false;
+
+    // Assign colors and keys, and verify
+    for(int i = 0; i < commitnum; i++) {
+        int first = requests[i*2];
+        int second = requests[i*2+1];
+
+        graphs[i].nodes[first].color = colors[i*2];
+        graphs[i].nodes[second].color = colors[i*2+1];
+        graphs[i].nodes[first].randkey = keys[i*2];
+        graphs[i].nodes[second].randkey = keys[i*2+1];
+        if(graphs[i].nodes[first].color == graphs[i].nodes[second].color)
+            return false;
+        if(!(graphs[i].nodes[first].VerHash() && graphs[i].nodes[second].VerHash()))
+            return false;
+    }
+    return true;
+}
+
+void Verifier::WriteGraph(ofstream& outfile) {
+    outfile << g->numnodes << endl;
+
+    for(int j = 0; j < g->numnodes; j++) {
+        for(int k = 0; k < g->numnodes; k++) {
+            if(g->neighbors[j][k])
+                outfile << "1 ";
+            else
+                outfile << "0 ";
+        }
+        outfile << endl;
+    }
 }
 
 // Send the graph to the prover
@@ -70,8 +161,8 @@ bool Verifier::Verify() {
 bool Verifier::SendVerRequest() {
     int none, ntwo;
     // Choose two neighbors
-    none = (rand() % g->numnodes);
     do {
+        none = (rand() % g->numnodes);
         ntwo = (rand() % g->numnodes);
     } while(!g->neighbors[none][ntwo]);
     // Get proof of their different colors
