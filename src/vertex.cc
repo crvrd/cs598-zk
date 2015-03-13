@@ -1,7 +1,5 @@
 #include "vertex.h"
 
-using namespace std;
-
 Vertex::Vertex() {
     color = 0;
     randkey = 0;

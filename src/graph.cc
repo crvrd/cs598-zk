@@ -1,7 +1,5 @@
 #include "graph.h"
 
-using namespace std;
-
 Graph::Graph() {
     numvertices = 0;
     numedges = 0;
@@ -21,6 +19,7 @@ Graph::Graph(int vertexnum) {
     }
 }
 
+// Deep copy
 Graph::Graph(const Graph &g1) {
     numvertices = g1.numvertices;
     numedges = g1.numedges;
@@ -50,15 +49,9 @@ void Graph::AssignEdges(int i, int j) {
     numedges++;
 }
 
+// We generally add twice as many edges as we need
 void Graph::NormalizeEdges() {
     numedges /= 2;
-}
-
-// Mark two vertices as being distant (not often used)
-void Graph::UnassignEdges(int i, int j) {
-    edges[i][j] = false;
-    edges[j][i] = false;
-    numedges--;
 }
 
 // Brute-force solving the coloring problem (TODO: actually solve)
@@ -72,34 +65,6 @@ bool Graph::Solve(int idx) {
     }
     return false;
 
-}
-
-// Make sure all edges are of different color
-// used to test our solution
-bool Graph::VerifyVertex(int vertex) {
-    for(int i = 0; i < numvertices; i++) {
-        if(edges[vertex][i]) {
-            if(vertices[i].color == vertices[vertex].color)
-                return false;
-        }
-    }
-    return true;
-}
-
-// Make sure the solution we found works,
-// meaning all edges are of different colors
-bool Graph::TestSolution() {
-    for(int i = 0; i < numvertices; i++) {
-        if(!VerifyVertex(i)) {
-            return false;
-        }
-    }
-    cout << "Solution: ";
-    for(int i = 0; i < numvertices; i++) {
-        cout << vertices[i].color << " ";
-    }
-    cout << endl;
-    return true;
 }
 
 // Generate a commitment for the graph
@@ -125,23 +90,30 @@ void Graph::GenCommitment() {
     }
 }
 
-// Print out the graph
-// Prints out a list of all the vertices and associated values
-// Also prints out a matrix for edges
-void Graph::Print() {
+// Make sure all edges are of different color
+// used to test our solution
+bool Graph::VerifyVertexColor(int vertex) {
     for(int i = 0; i < numvertices; i++) {
-        cout << "Vertex " << i << ": ";
-        cout << vertices[i].color << ", ";
-        cout << vertices[i].randkey << endl;
-    }
-    for(int i = 0; i < numvertices; i++) {
-        for(int j = 0; j < numvertices; j++) {
-            if(edges[i][j]) 
-                cout << "1 ";
-            else
-                cout << "0 ";
+        if(edges[vertex][i]) {
+            if(vertices[i].color == vertices[vertex].color)
+                return false;
         }
-        cout << endl;
     }
-    cout << endl;
+    return true;
+}
+
+// Make sure the solution we found works,
+// meaning all edges are of different colors
+bool Graph::TestSolution() {
+    for(int i = 0; i < numvertices; i++) {
+        if(!VerifyVertexColor(i)) {
+            return false;
+        }
+    }
+    std::cout << "Solution: ";
+    for(int i = 0; i < numvertices; i++) {
+        std::cout << vertices[i].color << " ";
+    }
+    std::cout << std::endl;
+    return true;
 }

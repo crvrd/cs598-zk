@@ -1,19 +1,19 @@
 #include "prover.h"
 
-using namespace std;
-
 int main(int argc, char* argv[]) {
     if(5 != argc) {
-        cout << "usage: ./peggy <hostname> <port> <graph file> <security parameter>" << endl;
+        std::cout << "usage: ./peggy <hostname> <port> <graph file> ";
+        std::cout << "<security parameter>" << std::endl;
         exit(-1);
     }
-
-    ifstream infile;
-    infile.exceptions(ifstream::eofbit | ifstream::badbit | ifstream::failbit | ifstream::goodbit);
+    
+    std::ifstream infile;
+    infile.exceptions(std::ifstream::eofbit | std::ifstream::badbit | 
+                      std::ifstream::failbit | std::ifstream::goodbit);
     try {
         infile.open(argv[3]);
     } catch(...) {
-        cout << "Problem opening file, exiting." << endl;
+        std::cout << "Problem opening file, exiting." << std::endl;
         exit(-1);
     }
 
@@ -21,26 +21,28 @@ int main(int argc, char* argv[]) {
     try {
         peggy = new Prover(infile);
     } catch(...) {
-        cout << "Could not initialize network connection." << endl;
+        std::cout << "Could not initialize network connection." << std::endl;
         exit(-1);
     }
     if(!peggy->SolveGraph()) {
-        cout << "No solution." << endl;
+        std::cout << "No solution." << std::endl;
         delete peggy;
         exit(0);
     }
-    if(!peggy->BeginExchange(stoi(argv[4]), argv[1], argv[2])) {
-        cout << "Security parameter exchange failed; probable mismatch" << endl;
+    if(!peggy->BeginExchange(std::stoi(argv[4]), argv[1], argv[2])) {
+        std::cout << "Security parameter exchange failed; probable mismatch";
+        std::cout << std::endl;
         delete peggy;
         exit(-1);
     }
     if(!peggy->GenerateCommitments()) {
-        cout << "Could not send graph" << endl;
+        std::cout << "Could not send graph" << std::endl;
         delete peggy;
         exit(-1);
     }
     if(!peggy->ProcessEdgeRequests()) {
-        cout << "Edge requests failed, probable non-edge query" << endl;
+        std::cout << "Edge requests failed, probable non-edge query";
+        std::cout << std::endl;
         delete peggy;
         exit(-1);
     }

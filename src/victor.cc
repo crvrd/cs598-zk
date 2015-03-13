@@ -1,43 +1,45 @@
 #include "verifier.h"
 
-using namespace std;
+#include <iostream>
 
 int main(int argc, char* argv[]) {
     if(4 != argc) {
-        cout << "usage:  ./victor <port> <security parameter> <output dir>" << endl;
+        std::cout << "usage:  ./victor <port> <security parameter> ";
+        std::cout << "<output dir>" << std::endl;
         exit(-1);
     }
     while(1) {
         Verifier* victor = new Verifier(argv[1]);
-        if(!victor->BeginExchange(stoi(argv[2]))) {
-            cout << "Could not begin exchange; probable security parameter mismatch" << endl;
+        if(!victor->BeginExchange(std::stoi(argv[2]))) {
+            std::cout << "Could not begin exchange; ";
+            std::cout << "probable security parameter mismatch" << std::endl;
             delete victor;
             continue;
         }
-        victor->GenerateRequests();
+        victor->GenerateEdgeRequests();
         if(!victor->RecvCommitments()) {
-            cout << "Could not receive commitments." << endl;
+            std::cout << "Could not receive commitments." << std::endl;
             delete victor;
             continue;
         }
-        if(!victor->SendRequests()) {
-            cout << "Problem sending requests." << endl;
+        if(!victor->SendEdgeRequests()) {
+            std::cout << "Problem sending requests." << std::endl;
             delete victor;
             continue;
         }
-        if(!victor->VerifyRequests()) {
-            cout << "Graph verification Failed." << endl;
+        if(!victor->VerifyEdgeRequests()) {
+            std::cout << "Graph verification Failed." << std::endl;
             delete victor;
             continue;
         }
-        // TODO:  Store graph somewhere!
-        ofstream outfile;
-        outfile.open(argv[3] + string("/g") + 
-                     to_string(time(NULL)) + to_string(rand()));
+
+        std::ofstream outfile;
+        outfile.open(argv[3] + std::string("/g") + 
+                     std::to_string(time(NULL)) + std::to_string(rand()));
         victor->WriteGraph(outfile);
         outfile.close();
         delete victor;
-        cout << "Graph verified!" << endl;
+        std::cout << "Graph verified!" << std::endl;
     }
 
 }

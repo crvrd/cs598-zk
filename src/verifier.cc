@@ -1,41 +1,6 @@
 #include "verifier.h"
 
-using namespace std;
-
-Verifier::Verifier() {}
-
-// Make a new graph, and connect to the prover server
-Verifier::Verifier(ifstream& infile) {
-    int vertexnum, edgeval;
-    infile >> vertexnum;
-    g = new Graph(vertexnum);
-    for(int i = 0; i < vertexnum; i++) {
-        for(int j = 0; j < vertexnum; j++) {
-            infile >> edgeval;
-            if(edgeval) {
-                g->AssignEdges(i, j);
-            }
-        }
-    }
-    network.Connect();
-}
-
-// Overloaded for choosing connections
-Verifier::Verifier(ifstream& infile, char* hostname, char* port) {
-    int vertexnum, edgeval;
-    infile >> vertexnum;
-    g = new Graph(vertexnum);
-    for(int i = 0; i < vertexnum; i++) {
-        for(int j = 0; j < vertexnum; j++) {
-            infile >> edgeval;
-            if(edgeval) {
-                g->AssignEdges(i, j);
-            }
-        }
-    }
-    network.Connect(hostname, port);
-}
-
+// Start accepting socket connections
 Verifier::Verifier(char* port) {
     network.Start(port);
     SeedRandom();
@@ -45,6 +10,7 @@ Verifier::~Verifier() {
     network.Close();
 }
 
+// Exchange security param and graph info
 bool Verifier::BeginExchange(int k) {
     int vertices, theirk;
     if(!network.RecvInt(&theirk))
@@ -62,7 +28,8 @@ bool Verifier::BeginExchange(int k) {
     return true;
 }
 
-void Verifier::GenerateRequests() {
+// Decide all of the edges we're going to ask to prove
+void Verifier::GenerateEdgeRequests() {
     requests = new int32_t[commitnum * 2];
     for(int i = 0; i < commitnum; i++) {
         int j,k;
@@ -75,6 +42,7 @@ void Verifier::GenerateRequests() {
     }
 }
 
+// Get the graph commitments from the prover
 bool Verifier::RecvCommitments() {
     graphs = new Graph[commitnum];
     for(int i = 0; i < commitnum; i++) {
@@ -85,13 +53,14 @@ bool Verifier::RecvCommitments() {
     return true;
 }
 
-bool Verifier::SendRequests() {
+// Send the prover all of our requests
+bool Verifier::SendEdgeRequests() {
     if(!network.SendBytes(requests, commitnum * 8))
         return false;
     return true;
 }
 
-bool Verifier::VerifyRequests() {
+bool Verifier::VerifyEdgeRequests() {
     // Get colors and random keys
     int32_t colors[commitnum * 2];
     uint64_t keys[commitnum * 2];
@@ -117,8 +86,9 @@ bool Verifier::VerifyRequests() {
     return true;
 }
 
-void Verifier::WriteGraph(ofstream& outfile) {
-    outfile << g->numvertices << endl;
+// Write the graph to a file
+void Verifier::WriteGraph(std::ofstream& outfile) {
+    outfile << g->numvertices << std::endl;
 
     for(int j = 0; j < g->numvertices; j++) {
         for(int k = 0; k < g->numvertices; k++) {
@@ -127,55 +97,6 @@ void Verifier::WriteGraph(ofstream& outfile) {
             else
                 outfile << "0 ";
         }
-        outfile << endl;
+        outfile << std::endl;
     }
-}
-
-// Send the graph to the prover
-bool Verifier::SendGraph() {
-    bool colorable;
-    network.SendInt(g->numvertices);
-    network.SendGraph(g);
-    network.RecvBool(&colorable);
-    return colorable;
-}
-
-// Get a full graph commitment from the prover
-bool Verifier::RecvGraphCommitment() {
-    return network.RecvCommitment(g);
-}
-
-// Verify that the solution the prover found is correct
-bool Verifier::Verify() {
-    int32_t numrequests = pow((g->numedges)/2, 2);
-    for(int i = 0; i < numrequests; i++) {
-        RecvGraphCommitment();
-        if(!SendVerRequest())
-            return false;
-    }
-    return true;
-}
-
-// Choose two vertices to verify, and verify them by getting the 
-// colors and random key values for the edges
-bool Verifier::SendVerRequest() {
-    int none, ntwo;
-    // Choose two edges
-    do {
-        none = (rand() % g->numvertices);
-        ntwo = (rand() % g->numvertices);
-    } while(!g->edges[none][ntwo]);
-    // Get proof of their different colors
-    network.SendInt(none);
-    network.SendInt(ntwo);
-    network.RecvProof(g, none);
-    network.RecvProof(g, ntwo);
-    // Check to make sure they're different, and there was no tampering.
-    if(g->vertices[none].color == g->vertices[ntwo].color)
-        return false;
-    return (g->vertices[none].VerHash() && g->vertices[ntwo].VerHash());
-}
-
-void Verifier::PrintGraph() {
-    g->Print();
 }

@@ -11,17 +11,15 @@ public:
     ~Graph();
     void AssignEdges(int i, int j);
     void NormalizeEdges();
-    void UnassignEdges(int i, int j);
     bool Solve(int idx);
     void GenCommitment();
-    void Print();
     int numvertices;
     int numedges;
     Vertex* vertices;
     bool** edges;
 private:
     int32_t colormap[3];
-    bool VerifyVertex(int vertex);
+    bool VerifyVertexColor(int vertex);
     bool TestSolution();
 };
 

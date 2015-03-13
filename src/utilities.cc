@@ -1,12 +1,11 @@
 #include "utilities.h"
 
-using namespace std;
-
 void SeedRandom()
 {
+    // Generate a random number based on urandom and time
     uint32_t fileseed, timeseed; 
-    ifstream urand;
-    urand.open("/dev/urandom", ios::binary);
+    std::ifstream urand;
+    urand.open("/dev/urandom", std::ios::binary);
     if (urand.is_open()) {
         urand.read((char*)&fileseed, sizeof(uint32_t));
         urand.close();

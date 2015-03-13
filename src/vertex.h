@@ -5,6 +5,7 @@
 #include <openssl/sha.h>
 #include <iostream>
 #include <cstring>
+
 #include "utilities.h"
 
 class Vertex{

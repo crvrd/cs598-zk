@@ -1,20 +1,18 @@
 #include "graph.h"
 
-using namespace std;
-
 int main(int argc, char* argv[]) {
     SeedRandom();
     if(5 != argc) {
-        cout << "usage: ./graphgen <# of graphs> <# of vertices per graph> <portion of edges> <dir>\n";
+        std::cout << "usage: ./graphgen <# of graphs> <# of vertices per graph> <portion of edges> <dir>\n";
         exit(-1);
     }
 
-    int vertices = stoi(argv[2]);
-    int graphs = stoi(argv[1]);
+    int vertices = std::stoi(argv[2]);
+    int graphs = std::stoi(argv[1]);
 
     for(int i = 0; i < graphs; i++) {
-        ofstream outfile;
-        outfile.open(argv[4] + string("/g") + to_string(i));
+        std::ofstream outfile;
+        outfile.open(argv[4] + std::string("/g") + std::to_string(i));
 
         Graph* g = new Graph(vertices);
 
@@ -28,7 +26,7 @@ int main(int argc, char* argv[]) {
             g->AssignEdges(k, l);
         }
 
-        outfile << vertices << endl;
+        outfile << vertices << std::endl;
 
         for(int j = 0; j < vertices; j++) {
             for(int k = 0; k < vertices; k++) {
@@ -37,8 +35,13 @@ int main(int argc, char* argv[]) {
                 else
                     outfile << "0 ";
             }
-            outfile << endl;
+            outfile << std::endl;
         }
+
+        if(g->Solve(0))
+            std::cout << "g" + std::to_string(i) + ": 3-colorable" << std::endl;
+        else
+            std::cout << "g" + std::to_string(i) + ":not 3-colorable" << std::endl;
 
         outfile.close();
     }
