@@ -56,6 +56,7 @@ bool Prover::BeginExchange(int k, int j, char* hostname, char* port) {
 
 // Make commitment hashes for all of the graphs
 bool Prover::GenerateCommitments() {
+    std::cout << commitnum << std::endl;
     graphs = new Graph[commitnum];
     for(int i = 0; i < commitnum; i++) {
         graphs[i] = *g;
