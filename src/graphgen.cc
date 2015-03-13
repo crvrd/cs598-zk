@@ -38,10 +38,9 @@ int main(int argc, char* argv[]) {
             outfile << std::endl;
         }
 
-        if(g->Solve(0))
-            std::cout << "g" + std::to_string(i) + ": 3-colorable" << std::endl;
-        else
-            std::cout << "g" + std::to_string(i) + ":not 3-colorable" << std::endl;
+        std::cout << "g" + std::to_string(i) + ": ";
+        if(!g->Solve(0))
+            std::cout << "no solution" << std::endl;
 
         outfile.close();
     }
