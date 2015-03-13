@@ -23,7 +23,8 @@ bool Verifier::BeginExchange(int k, int j) {
         return false;
     if(max(k, theirk) > min(j, theirj))
         return false;
-    sec = avg(max(k, theirk), min(j, theirj));
+    sec = max(max(k, theirk), min(j, theirj));
+    std::cout << "Security parameter: " << sec << std::endl;
     if(!network.RecvInt(&vertices))
         return false;
     g = new Graph(vertices);

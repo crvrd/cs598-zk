@@ -45,7 +45,8 @@ bool Prover::BeginExchange(int k, int j, char* hostname, char* port) {
         return false;
     if(max(k, theirk) > min(j, theirj))
         return false;
-    sec = avg(max(k, theirk), min(j, theirj));
+    sec = max(max(k, theirk), min(j, theirj));
+    std::cout << "Security parameter: " << sec << std::endl;
     commitnum = sec*g->numedges;
     if(!network.SendInt(g->numvertices))
         return false;
