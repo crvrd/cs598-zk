@@ -73,8 +73,14 @@ bool Prover::GenerateCommitments() {
 bool Prover::ProcessEdgeRequests(bool cheat) {
     // Receive requests
     requests = new int32_t[commitnum * 2];
-    if(!network.RecvBytes((char*)requests, commitnum * 8))
-        return false;
+    /*if(!network.RecvBytes((char*)requests, commitnum * 8))
+        return false;*/
+    for(int i = 0; i < commitnum; i++) {
+        if(!network.RecvInt(&requests[i*2]))
+            return false;
+        if(!network.RecvInt(&requests[i*2+1]))
+            return false;
+    }
 
     // Find response information
     /*int32_t colors[commitnum * 2];

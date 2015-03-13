@@ -61,8 +61,14 @@ bool Verifier::RecvCommitments() {
 
 // Send the prover all of our requests
 bool Verifier::SendEdgeRequests() {
-    if(!network.SendBytes(requests, commitnum * 8))
-        return false;
+    for(int i = 0; i < commitnum; i++) {
+        if(!network.SendInt(requests[i*2]))
+            return false;
+        if(!network.SendInt(requests[i*2+1]))
+            return false;
+    }
+    /*if(!network.SendBytes(requests, commitnum * 8))
+        return false;*/
     return true;
 }
 
@@ -113,6 +119,10 @@ bool Verifier::VerifyEdgeRequests() {
         if(graphs[i].vertices[first].color == graphs[i].vertices[second].color)
             return false;
         std::cout << i << std::endl;
+        std::cout << graphs[i].vertices[first].color << " ";
+        std::cout << graphs[i].vertices[second].color << " ";
+        std::cout << graphs[i].vertices[first].randkey << " ";
+        std::cout << graphs[i].vertices[second].randkey << std::endl;
         if(!(graphs[i].vertices[first].VerHash() && graphs[i].vertices[second].VerHash()))
             return false;
     }
