@@ -117,7 +117,6 @@ bool Network::RecvBytes(char* ptr, int32_t num) {
     int bytesread = 0;
     int curr = 0;
     do {
-        //std::cout << "i" << std::endl;
         curr = recv(sockfd, ptr + bytesread, num - bytesread, 0);
         bytesread += curr;
     } while(bytesread < num);
