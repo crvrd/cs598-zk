@@ -16,18 +16,18 @@ Prover::Prover(char* port) {
 }
 
 Prover::Prover(ifstream& infile) {
-    int nodenum, neighborval;
-    infile >> nodenum;
-    g = new Graph(nodenum);
-    for(int i = 0; i < nodenum; i++) {
-        for(int j = 0; j < nodenum; j++) {
-            infile >> neighborval;
-            if(neighborval) {
-                g->AssignNeighbors(i, j);
+    int vertexnum, edgeval;
+    infile >> vertexnum;
+    g = new Graph(vertexnum);
+    for(int i = 0; i < vertexnum; i++) {
+        for(int j = 0; j < vertexnum; j++) {
+            infile >> edgeval;
+            if(edgeval) {
+                g->AssignEdges(i, j);
             }
         }
     }
-    g->NormalizeNeighbors();
+    g->NormalizeEdges();
     SeedRandom();
 }
 
@@ -50,8 +50,8 @@ bool Prover::BeginExchange(int k, char* hostname, char* port) {
         return false;
     if(k != theirk)
         return false;
-    commitnum = k*g->numneighbors;
-    if(!network.SendInt(g->numnodes))
+    commitnum = k*g->numedges;
+    if(!network.SendInt(g->numvertices))
         return false;
     return network.SendGraph(g);
     return true;
@@ -82,12 +82,12 @@ bool Prover::ProcessEdgeRequests() {
     for(int i = 0; i < commitnum; i++) {
         int first = requests[i*2];
         int second = requests[i*2+1];
-        if(!graphs[i].neighbors[first][second])
+        if(!graphs[i].edges[first][second])
             return false;
-        colors[i*2] = graphs[i].nodes[first].color;
-        colors[i*2+1] = graphs[i].nodes[second].color;
-        keys[i*2] = graphs[i].nodes[first].randkey;
-        keys[i*2+1] = graphs[i].nodes[second].randkey;
+        colors[i*2] = graphs[i].vertices[first].color;
+        colors[i*2+1] = graphs[i].vertices[second].color;
+        keys[i*2] = graphs[i].vertices[first].randkey;
+        keys[i*2+1] = graphs[i].vertices[second].randkey;
     }
 
     // Send responses
@@ -101,10 +101,10 @@ bool Prover::ProcessEdgeRequests() {
 // Get the graph from the verifier, and find a solution if one exists
 // Also let the verifier know if there's a solution
 bool Prover::RecvAndSolveGraph() {
-    int nodenum;
-    network.RecvInt(&nodenum);
+    int vertexnum;
+    network.RecvInt(&vertexnum);
 
-    g = new Graph(nodenum);
+    g = new Graph(vertexnum);
     network.RecvGraph(g);
     bool retval = g->Solve(0);
     network.SendBool(retval);
@@ -114,10 +114,10 @@ bool Prover::RecvAndSolveGraph() {
 // Attempt to cheat at solving the graph.  Pretend there's a solution 
 // when there really isn't.
 bool Prover::CheatSolveGraph() {
-    int nodenum;
-    network.RecvInt(&nodenum);
+    int vertexnum;
+    network.RecvInt(&vertexnum);
 
-    g = new Graph(nodenum);
+    g = new Graph(vertexnum);
     network.RecvGraph(g);
     if(!g->Solve(0))
         cout << "No solution, but we will cheat" << endl;
@@ -136,9 +136,9 @@ bool Prover::SendGraphCommitment() {
 
 // Prove to the verifier that the solution works
 bool Prover::Prove() {
-    int32_t numrequests = pow((g->numneighbors)/2, 2);
+    int32_t numrequests = pow((g->numedges)/2, 2);
     // Each round, we generate a new commitment, and show that 
-    // Two adjacent nodes are not the same color
+    // Two adjacent vertices are not the same color
     for(int i = 0; i < numrequests; i++) {
         GenerateCommitment();
         SendGraphCommitment();
@@ -150,7 +150,7 @@ bool Prover::Prove() {
 
 // Attempt to cheat at the proof by calling CheatVerRequest()
 void Prover::CheatProof() {
-    int32_t numrequests = pow((g->numneighbors)/2, 2);
+    int32_t numrequests = pow((g->numedges)/2, 2);
     for(int i = 0; i < numrequests; i++) {
         GenerateCommitment();
         SendGraphCommitment();
@@ -160,17 +160,17 @@ void Prover::CheatProof() {
     return true;
 }
 
-// Get a request of two neighbors to respond to, and show that they
+// Get a request of two edges to respond to, and show that they
 // are not the same color
 bool Prover::RespondVerRequest() {
-    // Get two ints for the indices of the nodes
+    // Get two ints for the indices of the vertices
     int none, ntwo;
     if(!network.RecvInt(&none))
         return false;
     if(!network.RecvInt(&ntwo))
         return false;
-    // Send the data for the nodes to prove their colors
-    if(g->neighbors[none][ntwo]){
+    // Send the data for the vertices to prove their colors
+    if(g->edges[none][ntwo]){
         if(!network.SendProof(g, none))
             return false;
         if(!network.SendProof(g, ntwo))
@@ -179,7 +179,7 @@ bool Prover::RespondVerRequest() {
     return true;
 }
 
-// Attempt to cheat the verification process by making the nodes different
+// Attempt to cheat the verification process by making the vertices different
 // colors, even if they aren't
 bool Prover::CheatVerRequest() {
     int none, ntwo;
@@ -187,10 +187,10 @@ bool Prover::CheatVerRequest() {
         return false;
     if(!network.RecvInt(&ntwo))
         return false;
-    if(g->neighbors[none][ntwo]){
-        // Make the two nodes different colors, even if they aren't
-        if(g->nodes[none].color == g->nodes[ntwo].color){
-            g->nodes[ntwo].color = (g->nodes[ntwo].color % 3) + 1;
+    if(g->edges[none][ntwo]){
+        // Make the two vertices different colors, even if they aren't
+        if(g->vertices[none].color == g->vertices[ntwo].color){
+            g->vertices[ntwo].color = (g->vertices[ntwo].color % 3) + 1;
         }
         if(!network.SendProof(g, none))
             return false;
@@ -204,12 +204,12 @@ void Prover::PrintGraph() {
     g->Print();
 }
 
-// Corrupt the solution by causing a node to have the same color
-// as its neighbor.
+// Corrupt the solution by causing a vertex to have the same color
+// as its edge.
 void Prover::CorruptSolution() {
-    for(int i = 0; i < g->numnodes; i++) {
-        if(g->neighbors[i][0]) {
-            g->nodes[0].color = g->nodes[i].color;
+    for(int i = 0; i < g->numvertices; i++) {
+        if(g->edges[i][0]) {
+            g->vertices[0].color = g->vertices[i].color;
             break;
         }
     }

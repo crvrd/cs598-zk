@@ -1,18 +1,18 @@
-#include "node.h"
+#include "vertex.h"
 
 using namespace std;
 
-Node::Node() {
+Vertex::Vertex() {
     color = 0;
     randkey = 0;
 }
 
-Node::Node(int col) {
+Vertex::Vertex(int col) {
     color = col;
 }
 
-// Generates the hash for the commitment for this node
-bool Node::GenHash() {
+// Generates the hash for the commitment for this vertex
+bool Vertex::GenHash() {
     // Hash x|r, where x is the color, and r is a 64-bit 
     // random key.
     unsigned char input[12];
@@ -34,7 +34,7 @@ bool Node::GenHash() {
 
 // Verifies that the color and key match the hash.
 // Verifier runs this to not be duped.
-bool Node::VerHash() {
+bool Vertex::VerHash() {
     unsigned char checkhash[SHA256_DIGEST_LENGTH];
     unsigned char input[12];
     memcpy(input, &color, 4);
@@ -58,7 +58,7 @@ bool Node::VerHash() {
 }
 
 // Match the color to the new mapping, and generate a new random key
-void Node::Randomize(int32_t* colormap) {
+void Vertex::Randomize(int32_t* colormap) {
     if(0 == color)
         color = (rand() % 3) + 1;
     else

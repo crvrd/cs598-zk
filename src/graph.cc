@@ -3,33 +3,33 @@
 using namespace std;
 
 Graph::Graph() {
-    numnodes = 0;
-    numneighbors = 0;
+    numvertices = 0;
+    numedges = 0;
 }
 
-// Create an empty graph with the appropriate number of nodes
-Graph::Graph(int nodenum) {
-    numnodes = nodenum;
-    nodes = new Node[numnodes];
-    neighbors = new bool*[numnodes];
-    numneighbors = 0;
-    for(int i = 0; i < numnodes; i++) {
-        neighbors[i] = new bool[numnodes];
-        for(int j = 0; j < numnodes; j++) {
-            neighbors[i][j] = false;
+// Create an empty graph with the appropriate number of vertices
+Graph::Graph(int vertexnum) {
+    numvertices = vertexnum;
+    vertices = new Vertex[numvertices];
+    edges = new bool*[numvertices];
+    numedges = 0;
+    for(int i = 0; i < numvertices; i++) {
+        edges[i] = new bool[numvertices];
+        for(int j = 0; j < numvertices; j++) {
+            edges[i][j] = false;
         }
     }
 }
 
 Graph::Graph(const Graph &g1) {
-    numnodes = g1.numnodes;
-    numneighbors = g1.numneighbors;
-    nodes = new Node[numnodes];
-    neighbors = new bool*[numnodes];
-    for(int i = 0; i < numnodes; i++) {
-        neighbors[i] = new bool[numnodes];
-        for(int j = 0; j < numnodes; j++) {
-            neighbors[i][j] = g1.neighbors[i][j];
+    numvertices = g1.numvertices;
+    numedges = g1.numedges;
+    vertices = new Vertex[numvertices];
+    edges = new bool*[numvertices];
+    for(int i = 0; i < numvertices; i++) {
+        edges[i] = new bool[numvertices];
+        for(int j = 0; j < numvertices; j++) {
+            edges[i][j] = g1.edges[i][j];
         }
     }
     for(int i = 0; i < 3; i++) {
@@ -38,35 +38,35 @@ Graph::Graph(const Graph &g1) {
 }
 
 Graph::~Graph() {
-    for(int i = 0; i < numnodes; i++) {
-        delete[] neighbors[i];
+    for(int i = 0; i < numvertices; i++) {
+        delete[] edges[i];
     }
 }
 
-// Mark two nodes as being adjacent
-void Graph::AssignNeighbors(int i, int j) {
-    neighbors[i][j] = true;
-    neighbors[j][i] = true;
-    numneighbors++;
+// Mark two vertices as being adjacent
+void Graph::AssignEdges(int i, int j) {
+    edges[i][j] = true;
+    edges[j][i] = true;
+    numedges++;
 }
 
-void Graph::NormalizeNeighbors() {
-    numneighbors /= 2;
+void Graph::NormalizeEdges() {
+    numedges /= 2;
 }
 
-// Mark two nodes as being distant (not often used)
-void Graph::UnassignNeighbors(int i, int j) {
-    neighbors[i][j] = false;
-    neighbors[j][i] = false;
-    numneighbors--;
+// Mark two vertices as being distant (not often used)
+void Graph::UnassignEdges(int i, int j) {
+    edges[i][j] = false;
+    edges[j][i] = false;
+    numedges--;
 }
 
 // Brute-force solving the coloring problem (TODO: actually solve)
 bool Graph::Solve(int idx) {
-    if(idx == numnodes)
+    if(idx == numvertices)
         return TestSolution();
     for(int color = 1; color < 4; color++) {
-        nodes[idx].color = color;
+        vertices[idx].color = color;
         if(Solve(idx+1))
             return true;
     }
@@ -74,12 +74,12 @@ bool Graph::Solve(int idx) {
 
 }
 
-// Make sure all neighbors are of different color
+// Make sure all edges are of different color
 // used to test our solution
-bool Graph::VerifyNode(int node) {
-    for(int i = 0; i < numnodes; i++) {
-        if(neighbors[node][i]) {
-            if(nodes[i].color == nodes[node].color)
+bool Graph::VerifyVertex(int vertex) {
+    for(int i = 0; i < numvertices; i++) {
+        if(edges[vertex][i]) {
+            if(vertices[i].color == vertices[vertex].color)
                 return false;
         }
     }
@@ -87,16 +87,16 @@ bool Graph::VerifyNode(int node) {
 }
 
 // Make sure the solution we found works,
-// meaning all neighbors are of different colors
+// meaning all edges are of different colors
 bool Graph::TestSolution() {
-    for(int i = 0; i < numnodes; i++) {
-        if(!VerifyNode(i)) {
+    for(int i = 0; i < numvertices; i++) {
+        if(!VerifyVertex(i)) {
             return false;
         }
     }
     cout << "Solution: ";
-    for(int i = 0; i < numnodes; i++) {
-        cout << nodes[i].color << " ";
+    for(int i = 0; i < numvertices; i++) {
+        cout << vertices[i].color << " ";
     }
     cout << endl;
     return true;
@@ -104,7 +104,7 @@ bool Graph::TestSolution() {
 
 // Generate a commitment for the graph
 // This randomizes the colors, and re-assigns new random 
-// values to the nodes, and re-generates hashes
+// values to the vertices, and re-generates hashes
 void Graph::GenCommitment() {
     // Randomize the colors, so the client can't link rounds
     colormap[0] = ((rand() % 3) + 1);
@@ -118,25 +118,25 @@ void Graph::GenCommitment() {
     else
         colormap[2] = 3;
 
-    // Generate random keys and hashes for nodes
-    for(int i = 0; i < numnodes; i++) {
-        nodes[i].Randomize(colormap);
-        nodes[i].GenHash();
+    // Generate random keys and hashes for vertices
+    for(int i = 0; i < numvertices; i++) {
+        vertices[i].Randomize(colormap);
+        vertices[i].GenHash();
     }
 }
 
 // Print out the graph
-// Prints out a list of all the nodes and associated values
-// Also prints out a matrix for neighbors
+// Prints out a list of all the vertices and associated values
+// Also prints out a matrix for edges
 void Graph::Print() {
-    for(int i = 0; i < numnodes; i++) {
-        cout << "Node " << i << ": ";
-        cout << nodes[i].color << ", ";
-        cout << nodes[i].randkey << endl;
+    for(int i = 0; i < numvertices; i++) {
+        cout << "Vertex " << i << ": ";
+        cout << vertices[i].color << ", ";
+        cout << vertices[i].randkey << endl;
     }
-    for(int i = 0; i < numnodes; i++) {
-        for(int j = 0; j < numnodes; j++) {
-            if(neighbors[i][j]) 
+    for(int i = 0; i < numvertices; i++) {
+        for(int j = 0; j < numvertices; j++) {
+            if(edges[i][j]) 
                 cout << "1 ";
             else
                 cout << "0 ";

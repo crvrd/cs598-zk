@@ -37,10 +37,10 @@ public:
     bool RecvBytes(void* ptr, int32_t num);
     bool SendInt(int32_t i);
     bool RecvInt(int32_t* i);
-    bool SendNodes(Graph* g);
-    bool RecvNodes(Graph* g);
-    bool SendNeighbors(Graph* g);
-    bool RecvNeighbors(Graph* g);
+    bool SendVertices(Graph* g);
+    bool RecvVertices(Graph* g);
+    bool SendEdges(Graph* g);
+    bool RecvEdges(Graph* g);
     bool SendGraph(Graph* g);
     bool RecvGraph(Graph* g);
     bool SendCommitment(Graph* g);
@@ -50,12 +50,12 @@ public:
     bool SendBool(bool i);
     bool RecvBool(bool* i);
 private:
-    bool SendNode(Node n);
-    bool RecvNode(Node* n);
+    bool SendVertex(Vertex n);
+    bool RecvVertex(Vertex* n);
     bool SendKey(uint64_t k);
     bool RecvKey(uint64_t* k);
-    bool SendNodeCommit(Graph* g, int idx);
-    bool RecvNodeCommit(Graph* g, int idx);
+    bool SendVertexCommit(Graph* g, int idx);
+    bool RecvVertexCommit(Graph* g, int idx);
     int sockfd;
     struct sockaddr their_addr;
     socklen_t sin_size;

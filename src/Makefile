@@ -4,14 +4,14 @@ LINKER = g++
 
 all: graphgen peggy victor
 
-peggy: peggy.o prover.o network.o graph.o node.o utilities.o
-	$(LINKER) peggy.o prover.o network.o graph.o node.o utilities.o -o peggy -lssl -lcrypto
+peggy: peggy.o prover.o network.o graph.o vertex.o utilities.o
+	$(LINKER) peggy.o prover.o network.o graph.o vertex.o utilities.o -o peggy -lssl -lcrypto
 
-victor: victor.o verifier.o network.o graph.o node.o utilities.o
-	$(LINKER) victor.o verifier.o network.o graph.o node.o utilities.o -o victor -lssl -lcrypto
+victor: victor.o verifier.o network.o graph.o vertex.o utilities.o
+	$(LINKER) victor.o verifier.o network.o graph.o vertex.o utilities.o -o victor -lssl -lcrypto
 
-graphgen: graphgen.o graph.o node.o utilities.o
-	$(LINKER) graphgen.o graph.o node.o utilities.o -o graphgen -lssl -lcrypto
+graphgen: graphgen.o graph.o vertex.o utilities.o
+	$(LINKER) graphgen.o graph.o vertex.o utilities.o -o graphgen -lssl -lcrypto
 
 graphgen.o: graphgen.cc graph.h
 	$(COMPILER) $(COMPILER_FLAGS) graphgen.cc
@@ -25,11 +25,11 @@ verifier.o: verifier.cc verifier.h network.h
 network.o: network.cc network.h graph.h
 	$(COMPILER) $(COMPILER_FLAGS) network.cc
 
-graph.o: graph.cc graph.h node.h
+graph.o: graph.cc graph.h vertex.h
 	$(COMPILER) $(COMPILER_FLAGS) graph.cc
 
-node.o: node.cc node.h utilities.h
-	$(COMPILER) $(COMPILER_FLAGS) node.cc
+vertex.o: vertex.cc vertex.h utilities.h
+	$(COMPILER) $(COMPILER_FLAGS) vertex.cc
 
 utilities.o: utilities.cc utilities.h
 	$(COMPILER) $(COMPILER_FLAGS) utilities.cc

@@ -1,5 +1,5 @@
-#ifndef NODE_H
-#define NODE_H
+#ifndef VERTEX_H
+#define VERTEX_H
 
 #include <stdint.h>
 #include <openssl/sha.h>
@@ -7,10 +7,10 @@
 #include <cstring>
 #include "utilities.h"
 
-class Node{
+class Vertex{
 public:
-    Node();
-    Node(int col);
+    Vertex();
+    Vertex(int col);
     bool GenHash();
     bool VerHash();
     void Randomize(int32_t* colormap);

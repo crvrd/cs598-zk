@@ -244,42 +244,42 @@ bool Network::RecvInt(int32_t* i) {
     return true;
 }
 
-// Send all the nodes in a graph 
-bool Network::SendNodes(Graph* g) {
-    if(!SendInt(g->numnodes))
+// Send all the vertices in a graph 
+bool Network::SendVertices(Graph* g) {
+    if(!SendInt(g->numvertices))
         return false;
-    for(int i = 0; i < g->numnodes; i++) {
-        if(!SendNode(g->nodes[i]))
+    for(int i = 0; i < g->numvertices; i++) {
+        if(!SendVertex(g->vertices[i]))
             return false;
     }
     return true;
 }
 
-bool Network::RecvNodes(Graph* g) {
-    if(!RecvInt(&g->numnodes))
+bool Network::RecvVertices(Graph* g) {
+    if(!RecvInt(&g->numvertices))
         return false;
-    for(int i = 0; i < g->numnodes; i++) {
-        if(!RecvNode(&g->nodes[i]))
+    for(int i = 0; i < g->numvertices; i++) {
+        if(!RecvVertex(&g->vertices[i]))
             return false;
     }
     return true;
 }
 
-// Send the neighbor matrix
-bool Network::SendNeighbors(Graph* g) {
-    for(int i = 0; i < g->numnodes; i++) {
-        for(int j = 0; j < g->numnodes; j++) {
-            if(!SendBool(g->neighbors[i][j]))
+// Send the edge matrix
+bool Network::SendEdges(Graph* g) {
+    for(int i = 0; i < g->numvertices; i++) {
+        for(int j = 0; j < g->numvertices; j++) {
+            if(!SendBool(g->edges[i][j]))
                 return false;
         }
     }
     return true;
 }
 
-bool Network::RecvNeighbors(Graph* g) {
-    for(int i = 0; i < g->numnodes; i++) {
-        for(int j = 0; j < g->numnodes; j++) {
-            if(!RecvBool(&g->neighbors[i][j]))
+bool Network::RecvEdges(Graph* g) {
+    for(int i = 0; i < g->numvertices; i++) {
+        for(int j = 0; j < g->numvertices; j++) {
+            if(!RecvBool(&g->edges[i][j]))
                 return false;
         }
     }
@@ -288,21 +288,21 @@ bool Network::RecvNeighbors(Graph* g) {
 
 // Send an entire graph
 bool Network::SendGraph(Graph* g) {
-    if(!SendNodes(g)) 
+    if(!SendVertices(g)) 
         return false;
-    if(!SendNeighbors(g))
+    if(!SendEdges(g))
         return false;
-    if(!SendInt(g->numneighbors))
+    if(!SendInt(g->numedges))
         return false;
     return true;
 }
 
 bool Network::RecvGraph(Graph* g) {
-    if(!RecvNodes(g)) 
+    if(!RecvVertices(g)) 
         return false;
-    if(!RecvNeighbors(g))
+    if(!RecvEdges(g))
         return false;
-    if(!RecvInt(&g->numneighbors))
+    if(!RecvInt(&g->numedges))
         return false;
     return true;
 }
@@ -320,8 +320,8 @@ bool Network::RecvBool(bool* b) {
     return true;
 }
 
-// Send a single node
-bool Network::SendNode(Node n) {
+// Send a single vertex
+bool Network::SendVertex(Vertex n) {
     if(!SendInt(n.color))
         return false;
     if(!SendKey(n.randkey))
@@ -329,7 +329,7 @@ bool Network::SendNode(Node n) {
     return true;
 }
 
-bool Network::RecvNode(Node* n) {
+bool Network::RecvVertex(Vertex* n) {
     if(!RecvInt(&n->color))
         return false;
     if(!RecvKey(&n->randkey))
@@ -352,49 +352,49 @@ bool Network::RecvKey(uint64_t* k) {
 
 // Send the commitment for the whole graph
 bool Network::SendCommitment(Graph* g) {
-    for(int i = 0; i < g->numnodes; i++) {
-        if(!SendNodeCommit(g, i))
+    for(int i = 0; i < g->numvertices; i++) {
+        if(!SendVertexCommit(g, i))
             return false;
     }
     return true;
 }
 
 bool Network::RecvCommitment(Graph* g) {
-    for(int i = 0; i < g->numnodes; i++) {
-        if(!RecvNodeCommit(g, i))
+    for(int i = 0; i < g->numvertices; i++) {
+        if(!RecvVertexCommit(g, i))
             return false;
     }
     return true;
 }
 
-// Send the commitment for an individual node
-bool Network::SendNodeCommit(Graph* g, int idx) {
-    unsigned char* tosend = g->nodes[idx].commithash;
+// Send the commitment for an individual vertex
+bool Network::SendVertexCommit(Graph* g, int idx) {
+    unsigned char* tosend = g->vertices[idx].commithash;
     if(send(sockfd, tosend, SHA256_DIGEST_LENGTH, 0) == -1)
         return false;
     return true;
 }
 
-bool Network::RecvNodeCommit(Graph* g, int idx) {
-    unsigned char* torecv = g->nodes[idx].commithash;
+bool Network::RecvVertexCommit(Graph* g, int idx) {
+    unsigned char* torecv = g->vertices[idx].commithash;
     if(recv(sockfd, torecv, SHA256_DIGEST_LENGTH, 0) < 0)
         return false;
     return true;
 }
 
-// Send the key and color for a node
+// Send the key and color for a vertex
 bool Network::SendProof(Graph* g, int idx) {
-    if(!SendInt(g->nodes[idx].color))
+    if(!SendInt(g->vertices[idx].color))
         return false;
-    if(!SendKey(g->nodes[idx].randkey))
+    if(!SendKey(g->vertices[idx].randkey))
         return false;
     return true;
 }
 
 bool Network::RecvProof(Graph* g, int idx) {
-    if(!RecvInt(&g->nodes[idx].color))
+    if(!RecvInt(&g->vertices[idx].color))
         return false;
-    if(!RecvKey(&g->nodes[idx].randkey))
+    if(!RecvKey(&g->vertices[idx].randkey))
         return false;
     return true;
 }

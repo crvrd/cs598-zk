@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
         exit(-1);
     }
     if(!peggy->ProcessEdgeRequests()) {
-        cout << "Edge requests failed, probable non-neighbor query" << endl;
+        cout << "Edge requests failed, probable non-edge query" << endl;
         delete peggy;
         exit(-1);
     }
