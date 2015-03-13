@@ -16,7 +16,5 @@ Verifier asks the prover to prove that a specific graph is 3-colorable.  The pro
 * Verifier verifies all E*k edge commitments
 * If all E*k edge commitments are verified, then the Verifier considers the graph colorability to be proven.
 
-* clean up verifier and prover: remove old stuff
-* comment, etc.
 * make cheating prover
 * test from not-home

@@ -11,20 +11,26 @@ Verifier::~Verifier() {
 }
 
 // Exchange security param and graph info
-bool Verifier::BeginExchange(int k) {
-    int vertices, theirk;
+bool Verifier::BeginExchange(int k, int j) {
+    int vertices, theirk, theirj, sec;
     if(!network.RecvInt(&theirk))
+        return false;
+    if(!network.RecvInt(&theirj))
         return false;
     if(!network.SendInt(k))
         return false;
-    if(theirk != k)
+    if(!network.SendInt(j))
         return false;
+    if(max(k, theirk) > min(j, theirj))
+        return false;
+    sec = avg(max(k, theirk), min(j, theirj));
     if(!network.RecvInt(&vertices))
         return false;
     g = new Graph(vertices);
     if(!network.RecvGraph(g))
         return false;
-    commitnum = k*g->numedges;
+    commitnum = sec*g->numedges;
+    std::cout << "parameter: " << sec << std::endl;
     return true;
 }
 

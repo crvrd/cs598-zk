@@ -8,7 +8,7 @@ public:
     Prover(std::ifstream& infile);
     ~Prover();
     bool SolveGraph();
-    bool BeginExchange(int k, char* hostname, char* port);
+    bool BeginExchange(int k, int j, char* hostname, char* port);
     bool GenerateCommitments();
     bool ProcessEdgeRequests();
 private:

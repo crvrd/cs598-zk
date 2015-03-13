@@ -9,7 +9,7 @@ class Verifier{
 public:
     Verifier(char* port);
     ~Verifier();
-    bool BeginExchange(int k);
+    bool BeginExchange(int k, int j);
     void GenerateEdgeRequests();
     bool RecvCommitments();
     bool SendEdgeRequests();

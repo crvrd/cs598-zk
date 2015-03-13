@@ -29,17 +29,23 @@ bool Prover::SolveGraph() {
 }
 
 // Connect to the server, and send security param and graph info
-bool Prover::BeginExchange(int k, char* hostname, char* port) {
+bool Prover::BeginExchange(int k, int j, char* hostname, char* port) {
     if(!network.Connect(hostname, port))
         throw -1;
-    int theirk;
+    int theirk, theirj, sec;
     if(!network.SendInt(k))
+        return false;
+    if(!network.SendInt(j))
         return false;
     if(!network.RecvInt(&theirk))
         return false;
-    if(k != theirk)
+    if(!network.RecvInt(&theirj))
         return false;
-    commitnum = k*g->numedges;
+    if(max(k, theirk) > min(j, theirj))
+        return false;
+    sec = avg(max(k, theirk), min(j, theirj));
+    commitnum = sec*g->numedges;
+    std::cout << "parameter: " << sec << std::endl;
     if(!network.SendInt(g->numvertices))
         return false;
     return network.SendGraph(g);

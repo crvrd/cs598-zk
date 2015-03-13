@@ -15,3 +15,19 @@ void SeedRandom()
     timeseed = time(NULL);
     srand(timeseed xor fileseed);
 }
+
+int max(int a, int b) {
+    if(a >= b)
+        return a;
+    return b;
+}
+
+int min(int a, int b) {
+    if(a <= b)
+        return a;
+    return b;
+}
+
+int avg(int a, int b) {
+    return (a+b)/2;
+}

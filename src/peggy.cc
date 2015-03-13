@@ -1,12 +1,12 @@
 #include "prover.h"
 
 int main(int argc, char* argv[]) {
-    if(5 != argc) {
+    if(6 != argc) {
         std::cout << "usage: ./peggy <hostname> <port> <graph file> ";
-        std::cout << "<security parameter>" << std::endl;
+        std::cout << "<security: low> <security: high>" << std::endl;
         exit(-1);
     }
-    
+
     std::ifstream infile;
     infile.exceptions(std::ifstream::eofbit | std::ifstream::badbit | 
                       std::ifstream::failbit | std::ifstream::goodbit);
@@ -29,7 +29,10 @@ int main(int argc, char* argv[]) {
         delete peggy;
         exit(0);
     }
-    if(!peggy->BeginExchange(std::stoi(argv[4]), argv[1], argv[2])) {
+    if(!peggy->BeginExchange(std::stoi(argv[4]), 
+                             std::stoi(argv[5]), 
+                             argv[1], 
+                             argv[2])) {
         std::cout << "Security parameter exchange failed; probable mismatch";
         std::cout << std::endl;
         delete peggy;
